@@ -1,0 +1,116 @@
+{
+  "scope": "Physical iPhone Safari on the target router; both/global mode. No other proxy was running according to the user.",
+  "router_report_received_at": "2026-10-19T18:50:52Z",
+  "time_alignment": "Matched sequential domain queries and intervals; browser wall clock is about 10 seconds ahead of router.",
+  "results": [
+    {
+      "host": "ad.doubleclick.net",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 1012,
+      "router_dns_response_codes": [
+        3
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": false
+    },
+    {
+      "host": "pagead2.googlesyndication.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 719,
+      "router_dns_response_codes": [
+        3
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": false
+    },
+    {
+      "host": "mi.gdt.qq.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 270,
+      "router_dns_response_codes": [
+        3
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": false
+    },
+    {
+      "host": "mobads.baidu.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 210,
+      "router_dns_response_codes": [
+        3
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": false
+    },
+    {
+      "host": "www.baidu.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 591,
+      "router_dns_response_codes": [
+        0
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": true
+    },
+    {
+      "host": "www.qq.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 1368,
+      "router_dns_response_codes": [
+        0
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": true
+    },
+    {
+      "host": "www.apple.com",
+      "browser_promise_resolved": true,
+      "browser_response_type": "opaque",
+      "elapsed_ms": 3639,
+      "router_dns_response_codes": [
+        0
+      ],
+      "router_dns_query_types": [
+        1,
+        28,
+        65
+      ],
+      "observed_tls_client_hello": true
+    }
+  ],
+  "limits": [
+    "A resolved no-cors promise with opaque response alone does not prove that an advertisement payload was received.",
+    "This first round alone cannot rule out a second route. Subsequent negative controls and the same-device cellular comparison are recorded in safari-cellular-comparison-2026-10-19.json."
+  ]
+}

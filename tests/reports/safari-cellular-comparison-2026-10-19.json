@@ -1,0 +1,143 @@
+{
+  "scope": "Physical iPhone Safari, both/global mode, same router rules and subscription. User confirmed no other proxy during testing.",
+  "rounds": [
+    {
+      "cellular_data": "available",
+      "received_at": "2026-10-19T18:57:05Z",
+      "mode": "both",
+      "routing": "global",
+      "results": [
+        {
+          "target": "ad.doubleclick.net",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "pagead2.googlesyndication.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "mi.gdt.qq.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "mobads.baidu.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.baidu.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.qq.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.apple.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "unresolvable.invalid",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "router-closed-port",
+          "browser_promise_resolved": false
+        }
+      ]
+    },
+    {
+      "cellular_data": "off, confirmed by user",
+      "received_at": "2026-10-19T19:00:50Z",
+      "mode": "both",
+      "routing": "global",
+      "results": [
+        {
+          "target": "ad.doubleclick.net",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "pagead2.googlesyndication.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "mi.gdt.qq.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "mobads.baidu.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "www.baidu.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.qq.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.apple.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "unresolvable.invalid",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "router-closed-port",
+          "browser_promise_resolved": false
+        }
+      ]
+    },
+    {
+      "cellular_data": "restored; Connectivity Assist disabled for this Wi-Fi, confirmed by user",
+      "received_at": "2026-10-19T19:03:24Z",
+      "mode": "both",
+      "routing": "global",
+      "results": [
+        {
+          "target": "ad.doubleclick.net",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "pagead2.googlesyndication.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "mi.gdt.qq.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "mobads.baidu.com",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "www.baidu.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.qq.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "www.apple.com",
+          "browser_promise_resolved": true
+        },
+        {
+          "target": "unresolvable.invalid",
+          "browser_promise_resolved": false
+        },
+        {
+          "target": "router-closed-port",
+          "browser_promise_resolved": false
+        }
+      ]
+    }
+  ],
+  "finding": "Cellular fallback bypassed router DNS filtering. On the same physical iPhone, disabling Connectivity Assist for the current Wi-Fi while keeping cellular data available restored filtering; the user confirmed 92% on Turtlecute. Four advertising targets failed, three normal website targets remained reachable, and both negative controls failed.",
+  "turtlecute_score": {
+    "percent": 92,
+    "reported_by": "User, on the same physical iPhone Safari after restoring cellular data and disabling Connectivity Assist for the current Wi-Fi",
+    "blocked_count": null
+  }
+}

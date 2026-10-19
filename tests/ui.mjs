@@ -158,6 +158,14 @@ try {
     assert.equal(await cdp.evaluate('document.getElementById("filterSummary").textContent.includes("此设备未启用")'),true,'Saved filters look active in direct mode');
     fixture.mode='both';await cdp.evaluate('refresh(false)');
     assert.equal(await cdp.evaluate('document.getElementById("filterSummary").textContent.includes("此设备已启用")'),true);
+    const originalUA=await cdp.evaluate('navigator.userAgent');
+    await cdp.send('Network.setUserAgentOverride',{userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1'});
+    await cdp.evaluate('refresh(false)');
+    assert.equal(await cdp.evaluate('document.getElementById("iosConnectivityHint").hidden'),false,'Missing iOS 27 filtering guidance');
+    fixture.mode='direct';await cdp.evaluate('refresh(false)');
+    assert.equal(await cdp.evaluate('document.getElementById("iosConnectivityHint").hidden'),true,'Direct mode shows unnecessary filtering guidance');
+    fixture.mode='both';
+    await cdp.send('Network.setUserAgentOverride',{userAgent:originalUA});await cdp.evaluate('refresh(false)');
   }
   await cdp.screenshot('ios-dark.png');
   await cdp.click('#nodeButton');await cdp.wait('document.getElementById("nodeDialog").open');
@@ -264,10 +272,13 @@ try {
     await cdp.send('Page.navigate',{url:base+'/netpilot-diagnostic.html'});
     await cdp.wait('document.getElementById("status")?.textContent.includes("结果已保存")');
     assert.equal(diagnosticReports.length,1,'Diagnostic upload did not retry busy response');
-    assert.equal(diagnosticReports[0].results.length,7);
-    assert.equal(diagnosticReports[0].results.filter(item=>item.outcome==='failed').length,4);
+    assert.equal(diagnosticReports[0].schema,2);
+    assert.equal(diagnosticReports[0].results.length,9);
+    assert.equal(diagnosticReports[0].results.filter(item=>item.outcome==='failed').length,6);
     assert.equal(diagnosticReports[0].results.filter(item=>item.outcome==='connected').length,3);
     const probes=await cdp.evaluate('window.diagnosticRequests');
+    assert(probes.some(p=>new URL(p.url).hostname==='np-'+diagnosticReports[0].nonce+'.invalid'));
+    assert(probes.some(p=>new URL(p.url).port==='65534'));
     assert(probes.every(p=>p.mode==='no-cors'&&p.method==='HEAD'&&p.credentials==='omit'&&p.cache==='no-store'));
     assert.equal(await cdp.evaluate('document.documentElement.scrollWidth<=innerWidth'),true,'Diagnostic page overflow');
     await cdp.tap('#run');

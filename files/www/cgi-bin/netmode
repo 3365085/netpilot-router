@@ -520,7 +520,7 @@ if [ "$REQ_ACTION" = record_diagnostic ]; then
     diagnostic_input=$(mktemp /tmp/netpilot-diagnostic-input.XXXXXX) || api_error '无法保存检查结果'
     diagnostic_output=$(mktemp /tmp/netpilot-diagnostic-output.XXXXXX) || { rm -f "$diagnostic_input"; api_error '无法保存检查结果'; }
     b64_decode > "$diagnostic_input"
-    if ! ucode /usr/lib/netpilot/diagnostic.uc "$diagnostic_input" "$CLIENT_IP" "$DEV_MODE" "$DEV_ROUTING" > "$diagnostic_output"; then
+    if ! ucode /usr/lib/netpilot/diagnostic.uc "$diagnostic_input" "$CLIENT_IP" "$DEV_MODE" "$DEV_ROUTING" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$diagnostic_output"; then
         rm -f "$diagnostic_input" "$diagnostic_output"; api_error '检查结果格式不正确'
     fi
     if ! mv "$diagnostic_output" "/tmp/netpilot-diagnostic-$CLIENT_IP.json"; then

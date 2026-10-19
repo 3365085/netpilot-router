@@ -16,14 +16,15 @@
   <h1>浏览器连接检查</h1>
   <p id="device">正在读取设备模式…</p>
   <div class="card" id="results"></div>
-  <p>每次使用新的地址发出请求，排除旧响应缓存。连接失败也可能来自网络错误，需结合路由器日志判断。检查结果会保存到路由器。</p>
+  <p>包含广告、正常网站和两项应当失败的对照。opaque 是浏览器返回的不可读结果，不能单独证明请求已到达网站。检查结果会保存到路由器。</p>
   <button id="run" type="button">重新检查</button>
   <p id="status" class="status" role="status"></p>
 </main><script>
   const targets = [
     ['ad.doubleclick.net','广告域名'],['pagead2.googlesyndication.com','广告域名'],
     ['mi.gdt.qq.com','国内广告域名'],['mobads.baidu.com','国内广告域名'],
-    ['www.baidu.com','正常网站对照'],['www.qq.com','正常网站对照'],['www.apple.com','正常网站对照']
+    ['www.baidu.com','正常网站对照'],['www.qq.com','正常网站对照'],['www.apple.com','正常网站对照'],
+    ['unresolvable.invalid','不存在的随机域名，应当失败'],['router-closed-port','路由器关闭端口，应当失败']
   ];
   const rows=[];
   for(const [host,note] of targets){
@@ -49,7 +50,7 @@
     if(running)return;running=true;document.getElementById('run').disabled=true;
     const status=document.getElementById('status');status.textContent='正在检查…';
     const nonce=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
-    const report={nonce,user_agent:navigator.userAgent,started_at:new Date().toISOString(),results:[]};
+    const report={schema:2,nonce,user_agent:navigator.userAgent,started_at:new Date().toISOString(),results:[]};
     try{
       const state=await api('/cgi-bin/netpilot?mode=status',{credentials:'same-origin',cache:'no-store'});
       document.getElementById('device').textContent=state.ip+' · '+(names[state.mode]||state.mode);
@@ -57,9 +58,11 @@
         const host=targets[i][0],start=performance.now(),controller=new AbortController();
         const timer=setTimeout(()=>controller.abort(),6000);rows[i].textContent='检查中';
         const item={host,outcome:'failed',response_type:'',error:'',elapsed_ms:0};
+        const probeHost=host==='unresolvable.invalid'?'np-'+nonce.slice(0,40)+'.invalid':host;
+        const url=host==='router-closed-port'?location.protocol+'//'+location.hostname+':65534/_netpilot_filter_check?nonce='+nonce:'https://'+probeHost+'/_netpilot_filter_check?nonce='+nonce;
         try{
-          const response=await fetch('https://'+host+'/_netpilot_filter_check?nonce='+nonce,{method:'HEAD',mode:'no-cors',credentials:'omit',cache:'no-store',redirect:'follow',signal:controller.signal});
-          item.outcome='connected';item.response_type=response.type;rows[i].textContent='请求连通';
+          const response=await fetch(url,{method:'HEAD',mode:'no-cors',credentials:'omit',cache:'no-store',redirect:'follow',signal:controller.signal});
+          item.outcome='connected';item.response_type=response.type;rows[i].textContent=response.type==='opaque'?'返回 opaque':'返回响应';
         }catch(error){item.error=error.name+': '+error.message;rows[i].textContent='连接失败'}
         finally{clearTimeout(timer);item.elapsed_ms=Math.round(performance.now()-start);report.results.push(item)}
       }

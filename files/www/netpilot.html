@@ -79,6 +79,7 @@
     .segmented button[aria-pressed="true"] { color:var(--text); background:var(--card); box-shadow:0 1px 4px rgba(0,0,0,.14); font-weight:600; }
     .footnote { margin:8px 16px 0; color:var(--secondary); font-size:12px; line-height:1.6; }
     .footnote + .footnote { margin-top:3px; }
+    .footnote a { color:var(--blue); text-decoration:none; }
     details { border-radius:16px; }
     summary { list-style:none; cursor:pointer; touch-action:manipulation; }
     summary::-webkit-details-marker { display:none; }
@@ -232,6 +233,7 @@
           <svg class="chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
         </button>
       </div>
+      <p class="footnote" id="iosConnectivityHint" hidden>在当前 Wi-Fi 的详情中关闭“使用连接助理”，让过滤流量保持走路由器。<a href="https://support.apple.com/zh-cn/127686" target="_blank" rel="noopener noreferrer">查看 iPhone 设置说明</a></p>
     </section>
     <section class="section">
       <details class="group" id="runtimeDetails">
@@ -423,6 +425,9 @@
       $("subscriptionSummary").textContent = selectedIndex < 0 ? "未添加" : friendlyName(profiles[selectedIndex], selectedIndex, "clash");
       const count = filters.filter((item) => item.enabled).length;
       const filtering = data.mode === "adg" || data.mode === "both";
+      const safariVersion = /Version\/(\d+)/.exec(navigator.userAgent);
+      const appleMobile = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      $("iosConnectivityHint").hidden = !(filtering && appleMobile && safariVersion && Number(safariVersion[1]) >= 27);
       $("filterSummary").textContent = filtering
         ? "此设备已启用 · " + Number(data.adblock_rules || 0).toLocaleString("zh-CN") + " 条域名"
         : "此设备未启用 · " + count + " 个规则源";
