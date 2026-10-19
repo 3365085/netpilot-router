@@ -367,67 +367,27 @@ apply_device_state() {
     local new_routing="$4"
     local host="$5"
 
-    ensure_nft_table
-    nft list table inet "$NFT_TABLE" >/dev/null 2>&1 || return 1
-
-    for s in mode_adg mode_clash mode_both mode_clash_global mode_both_global; do
-        nft delete element inet "$NFT_TABLE" "$s" "{ $ip }" 2>/dev/null
+    local lock=/var/lock/netpilot-state.lock tries=0 tmp_file old_file
+    until mkdir "$lock" 2>/dev/null; do
+        tries=$((tries + 1)); [ "$tries" -lt 10 ] || return 1; sleep 1
     done
-
-    if [ -n "$mac" ] && [ "$mac" != "00:00:00:00:00:00" ]; then
-        for ms in mode_adg_mac mode_clash_mac mode_both_mac; do
-            nft delete element inet "$NFT_TABLE" "$ms" "{ $mac }" 2>/dev/null
-        done
+    tmp_file=$(mktemp "$CONF_DIR/.state.XXXXXX") || { rmdir "$lock"; return 1; }
+    old_file=$(mktemp "$CONF_DIR/.previous.XXXXXX") || { rm -f "$tmp_file"; rmdir "$lock"; return 1; }
+    cp "$PEERS_FILE" "$old_file" || { rm -f "$tmp_file" "$old_file"; rmdir "$lock"; return 1; }
+    awk -F'|' -v m="$mac" -v target="$ip" '
+        !( (m != "00:00:00:00:00:00" && tolower($1) == m) || $2 == target ) { print $0 }
+    ' "$PEERS_FILE" > "$tmp_file"
+    printf '%s|%s|%s|%s|%s\n' "$mac" "$ip" "$new_mode" "$new_routing" "$host" >> "$tmp_file"
+    chmod 600 "$tmp_file"
+    mv "$tmp_file" "$PEERS_FILE"
+    if ! NETPILOT_STATE_LOCKED=1 /etc/init.d/allinone reload >/dev/null 2>&1; then
+        mv "$old_file" "$PEERS_FILE"
+        NETPILOT_STATE_LOCKED=1 /etc/init.d/allinone reload >/dev/null 2>&1 || true
+        rmdir "$lock"
+        return 1
     fi
-
-    if [ -f "$PEERS_FILE" ] && [ "$mac" != "00:00:00:00:00:00" ]; then
-        local old_ip
-        old_ip=$(awk -F'|' -v m="$mac" 'tolower($1) == m {print $2; exit}' "$PEERS_FILE")
-        if [ -n "$old_ip" ] && [ "$old_ip" != "$ip" ]; then
-            for s in mode_adg mode_clash mode_both mode_clash_global mode_both_global; do
-                nft delete element inet "$NFT_TABLE" "$s" "{ $old_ip }" 2>/dev/null
-            done
-        fi
-    fi
-
-    [ "$new_routing" != "global" ] && new_routing="rule"
-    case "$new_mode" in
-        adg)
-            nft add element inet "$NFT_TABLE" mode_adg "{ $ip }" 2>/dev/null || return 1
-            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_adg_mac "{ $mac }" 2>/dev/null
-            ;;
-        clash)
-            if [ "$new_routing" = "global" ]; then
-                nft add element inet "$NFT_TABLE" mode_clash_global "{ $ip }" 2>/dev/null
-            else
-                nft add element inet "$NFT_TABLE" mode_clash "{ $ip }" 2>/dev/null
-            fi
-            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_clash_mac "{ $mac }" 2>/dev/null
-            ;;
-        both)
-            if [ "$new_routing" = "global" ]; then
-                nft add element inet "$NFT_TABLE" mode_both_global "{ $ip }" 2>/dev/null
-            else
-                nft add element inet "$NFT_TABLE" mode_both "{ $ip }" 2>/dev/null
-            fi
-            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_both_mac "{ $mac }" 2>/dev/null
-            ;;
-        direct|*)
-            new_mode="direct"
-            ;;
-    esac
-
-    local tmp_file="/tmp/peers.conf.$$"
-    if [ -f "$PEERS_FILE" ]; then
-        awk -F'|' -v m="$mac" -v target="$ip" '
-            BEGIN { IGNORECASE=1 }
-            !( (m != "00:00:00:00:00:00" && tolower($1) == m) || $2 == target ) { print $0 }
-        ' "$PEERS_FILE" > "$tmp_file" 2>/dev/null || : > "$tmp_file"
-    else
-        : > "$tmp_file"
-    fi
-    echo "${mac}|${ip}|${new_mode}|${new_routing}|${host}" >> "$tmp_file" 2>/dev/null || true
-    mv "$tmp_file" "$PEERS_FILE" 2>/dev/null || rm -f "$tmp_file" 2>/dev/null
+    rm -f "$old_file"
+    rmdir "$lock"
 }
 
 get_core_metrics() {
@@ -608,10 +568,16 @@ fi
 get_core_metrics
 BACKEND=$(cat "$CONF_DIR/backend" 2>/dev/null || echo unknown)
 UDP_PROXY=false
-[ "$BACKEND" != tproxy ] || UDP_PROXY=true
+case "$BACKEND" in tproxy|tc-tun) UDP_PROXY=true ;; esac
+TUN_READY=false
+if [ "$BACKEND" = tc-tun ]; then
+    /usr/sbin/netpilot-tun check >/dev/null 2>&1 && TUN_READY=true
+    [ "$TUN_READY" = true ] || FIREWALL_TUN_FAILED=true
+fi
 ADBLOCK_COUNT=$(cat "$CONF_DIR/adblock.count" 2>/dev/null || echo 0)
 FIREWALL_READY=false
 nft list table inet "$NFT_TABLE" >/dev/null 2>&1 && FIREWALL_READY=true
+[ "${FIREWALL_TUN_FAILED:-false}" != true ] || FIREWALL_READY=false
 curl -fsS --max-time 2 "$MIHOMO_API/version" >/dev/null 2>&1 || CORE_RUNNING=false
 
 SAFE_HOST=$(json_escape "$CLIENT_HOST")
@@ -638,6 +604,8 @@ cat <<EOF
   "firewall_ready": ${FIREWALL_READY},
   "backend": "${BACKEND}",
   "udp_proxy": ${UDP_PROXY},
+  "tun_ready": ${TUN_READY},
+  "proxy_failure_policy": "block",
   "adblock_rules": ${ADBLOCK_COUNT},
   "memory_mb": "${CORE_MEM_MB}",
   "clash_profiles": ${CLASH_JSON},
@@ -645,7 +613,7 @@ cat <<EOF
   "node_selection": ${NODES_JSON},
   "connections_reset": ${CONNECTIONS_RESET},
   "connection_reset_ok": ${CONNECTION_RESET_OK},
-  "version": "1.2.2",
+  "version": "1.3.0",
   "ipv6_leak_guard": true,
   "sniffer": true,
   "message": "${SAFE_MSG}"

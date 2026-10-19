@@ -8,7 +8,13 @@ ADG_LIST_FILE="$CONF_DIR/adg_sources.conf"
 BASE_FILE="${NETPILOT_BASE_FILE:-/usr/share/netpilot/base.yaml}"
 
 netpilot_backend() {
-    if ip -4 rule show >/dev/null 2>&1; then echo tproxy; else echo redirect; fi
+    if ip -4 rule show >/dev/null 2>&1; then
+        echo tproxy
+    elif /usr/bin/mihomo -v 2>/dev/null | grep -q with_gvisor && /usr/sbin/netpilot-tun probe >/dev/null 2>&1; then
+        echo tc-tun
+    else
+        echo redirect
+    fi
 }
 
 netpilot_domains() {
@@ -82,7 +88,12 @@ EOF
     fi
     local listener=redir udp='# TCP compatibility mode'
     if [ "$backend" = tproxy ]; then listener=tproxy; udp='udp: true'; fi
-    sed -e "s/@BACKEND@/$listener/g" -e "s/@UDP@/$udp/g" "$BASE_FILE" > "$work/config.yaml"
+    if [ "$backend" = tc-tun ]; then
+        sed '/^listeners:/,$d' "$BASE_FILE" > "$work/config.yaml"
+        cat "${NETPILOT_TUN_FILE:-/usr/share/netpilot/tun.yaml}" >> "$work/config.yaml"
+    else
+        sed -e "s/@BACKEND@/$listener/g" -e "s/@UDP@/$udp/g" "$BASE_FILE" > "$work/config.yaml"
+    fi
     if [ -n "$cid" ]; then
         cat >> "$work/config.yaml" <<EOF
 proxy-providers:
@@ -103,6 +114,8 @@ EOF
             echo "    path: $cvalue" >> "$work/config.yaml"
         fi
         cat >> "$work/config.yaml" <<'EOF'
+    override:
+      udp: true
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204

@@ -1,0 +1,18 @@
+#!/bin/sh
+# procd respawns Mihomo; rebuild TC bindings when its TUN ifindexes change.
+# The persistent nft guard rejects uncaptured proxy traffic during recovery.
+set -u
+while sleep 5; do
+    [ "$(cat /etc/allinone/backend 2>/dev/null)" = tc-tun ] || continue
+    curl -fsS --max-time 2 http://127.0.0.1:9090/version >/dev/null 2>&1 || continue
+    /usr/sbin/netpilot-tun ready || continue
+    if ! nft list table inet netmode >/dev/null 2>&1; then
+        /etc/init.d/allinone reload >/dev/null 2>&1 || logger -t netpilot 'Firewall recovery pending'
+    elif ! /usr/sbin/netpilot-tun check >/dev/null 2>&1; then
+        if /usr/sbin/netpilot-tun sync >/dev/null 2>&1; then
+            logger -t netpilot 'TUN bindings recovered'
+        else
+            logger -t netpilot 'TUN recovery pending; proxy traffic remains blocked'
+        fi
+    fi
+done

@@ -1,4 +1,4 @@
 #!/bin/sh
-# Called by fw4 after a firewall reload. Never starts a stopped service.
-curl -fsS --max-time 2 http://127.0.0.1:9090/version >/dev/null 2>&1 || exit 0
+# Restore saved guards even while the core is stopped. Never starts a service.
+[ -s /etc/allinone/backend ] || exit 0
 /etc/init.d/allinone reload

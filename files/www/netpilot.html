@@ -432,7 +432,7 @@
         ? "此设备已启用 · " + Number(data.adblock_rules || 0).toLocaleString("zh-CN") + " 条域名"
         : "此设备未启用 · " + count + " 个规则源";
       $("backendNote").hidden = data.backend !== "redirect";
-      $("backendValue").textContent = data.backend === "tproxy" ? "TCP / UDP" : (data.backend === "redirect" ? "TCP 兼容模式" : "未知");
+      $("backendValue").textContent = data.backend === "tc-tun" ? "TUN · TCP / UDP" : (data.backend === "tproxy" ? "TPROXY · TCP / UDP" : (data.backend === "redirect" ? "TCP 兼容模式" : "未知"));
       $("firewallValue").textContent = data.firewall_ready ? "已就绪" : "未就绪";
       $("memoryValue").textContent = data.core_running ? data.memory_mb + " MB" : "—";
       $("macValue").textContent = data.mac || "—";

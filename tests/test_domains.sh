@@ -28,7 +28,7 @@ cat > "$task_tmp/expected" <<'EOF'
 +.tracker.example.net
 EOF
 diff -u "$task_tmp/expected" "$task_tmp/actual"
-for script in install.sh files/etc/init.d/allinone files/usr/lib/netpilot/config.sh files/usr/sbin/netpilot-rebuild files/usr/sbin/netpilot-firewall files/usr/sbin/netpilot-nodes files/usr/sbin/netpilot-connections files/www/cgi-bin/netmode; do
+for script in install.sh files/etc/init.d/allinone files/usr/lib/netpilot/config.sh files/usr/sbin/netpilot-rebuild files/usr/sbin/netpilot-firewall files/usr/sbin/netpilot-nodes files/usr/sbin/netpilot-connections files/usr/sbin/netpilot-tun files/usr/sbin/netpilot-watch files/www/cgi-bin/netmode; do
     sh -n "$script"
 done
 printf 'PASS: domain normalization and shell syntax\n'

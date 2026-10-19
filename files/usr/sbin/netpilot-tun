@@ -1,0 +1,124 @@
+#!/bin/sh
+# Per-device TUN delivery through TC ingress. No default route or ip rule changes.
+set -eu
+CONF_DIR="${NETMODE_CONF_DIR:-/etc/allinone}"
+STATE="${NETPILOT_TUN_STATE:-/var/run/netpilot-tun}"
+PREF=49200
+mkdir -p "$STATE"
+
+lan_device() {
+    local dev
+    dev="${NETPILOT_LAN_DEVICE:-$(ubus call network.interface.lan status 2>/dev/null | jsonfilter -e '@.l3_device')}"
+    [ -n "$dev" ] || dev=$(uci -q get network.lan.device)
+    case "$dev" in ''|*[!a-zA-Z0-9_.-]*) return 1 ;; esac
+    [ -d "/sys/class/net/$dev" ] || return 1
+    echo "$dev"
+}
+
+probe() {
+    command -v tc >/dev/null || return 1
+    [ -c /dev/net/tun ] || return 1
+    local link="nptc$$" tun="nptt$$" result=1
+    # Disposable interfaces only; never install a live capture rule.
+    ip link add "$link" type dummy >/dev/null 2>&1 || return 1
+    if ip tuntap add dev "$tun" mode tun >/dev/null 2>&1; then
+        if tc qdisc add dev "$link" clsact >/dev/null 2>&1 &&
+           tc filter add dev "$link" ingress protocol ip chain 42001 pref 10 u32 \
+              match ip src 192.0.2.2/32 action mirred egress redirect dev "$tun" >/dev/null 2>&1 &&
+           tc filter add dev "$link" ingress protocol ip pref "$PREF" handle 1 basic \
+              action goto chain 42001 >/dev/null 2>&1 &&
+           tc filter replace dev "$link" ingress protocol ip pref "$PREF" handle 1 basic \
+              action goto chain 42001 >/dev/null 2>&1; then result=0; fi
+        ip tuntap del dev "$tun" mode tun >/dev/null 2>&1 || true
+    fi
+    ip link del "$link" >/dev/null 2>&1 || true
+    return "$result"
+}
+
+ready() {
+    local dev
+    for dev in npt-cr npt-br npt-cg npt-bg; do
+        [ -r "/sys/class/net/$dev/ifindex" ] && [ "$(cat "/sys/class/net/$dev/type")" = 65534 ] || return 1
+        [ "$(cat "/sys/class/net/$dev/operstate")" != down ] || return 1
+    done
+}
+
+fingerprint() {
+    local dev lan
+    lan=$(lan_device) || return 1
+    printf '%s|' "$lan"
+    cat "/sys/class/net/$lan/ifindex"
+    for dev in npt-cr npt-br npt-cg npt-bg; do cat "/sys/class/net/$dev/ifindex" || return 1; done
+    sha256sum "$CONF_DIR/peers.conf"
+}
+
+sync_filters() {
+    ready || return 1
+    local lan chain=42001 old=42002 mac ip mode routing host dev cidr
+    lan=$(lan_device) || return 1
+    if [ -r "$STATE/chain" ] && [ "$(cat "$STATE/chain")" = 42001 ]; then chain=42002; old=42001; fi
+    # Preserve unrelated QoS. Switch the dispatcher only after staging succeeds.
+    tc qdisc show dev "$lan" | grep -qE 'qdisc (clsact|ingress) ' || tc qdisc add dev "$lan" clsact
+    tc chain del dev "$lan" ingress chain "$chain" >/dev/null 2>&1 || true
+    for cidr in 0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.168.0.0/16 224.0.0.0/3; do
+        tc filter add dev "$lan" ingress protocol ip chain "$chain" pref 10 u32 \
+            match ip dst "$cidr" action pass || return 1
+    done
+    # DNS continues through the existing per-device nft/dnsmasq filter path.
+    for proto in 6 17; do
+        tc filter add dev "$lan" ingress protocol ip chain "$chain" pref 20 u32 \
+            match ip protocol "$proto" 0xff match u16 0 0x1fff at 6 match ip dport 53 0xffff action pass || return 1
+    done
+    while IFS='|' read -r mac ip mode routing host; do
+        case "$mode|$routing" in
+            'clash|rule') dev=npt-cr ;; 'both|rule') dev=npt-br ;;
+            'clash|global') dev=npt-cg ;; 'both|global') dev=npt-bg ;;
+            *) continue ;;
+        esac
+        echo "$ip" | awk -F. 'NF!=4 {exit 1} {for(i=1;i<=4;i++) if($i !~ /^[0-9]+$/ || $i>255) exit 1}' || return 1
+        for proto in 6 17; do
+            tc filter add dev "$lan" ingress protocol ip chain "$chain" pref 100 u32 \
+                match ip src "$ip/32" match ip protocol "$proto" 0xff \
+                action mirred egress redirect dev "$dev" || return 1
+        done
+    done < "$CONF_DIR/peers.conf"
+    fingerprint > "$STATE/fingerprint.tmp" || return 1
+    tc filter replace dev "$lan" ingress protocol ip pref "$PREF" handle 1 basic \
+        action goto chain "$chain" || return 1
+    echo "$chain" > "$STATE/chain"
+    echo "$lan" > "$STATE/device"
+    mv "$STATE/fingerprint.tmp" "$STATE/fingerprint"
+    tc chain del dev "$lan" ingress chain "$old" >/dev/null 2>&1 || true
+}
+
+remove_filters() {
+    local lan
+    lan=$(cat "$STATE/device" 2>/dev/null) || lan=$(lan_device) || return 0
+    case "$lan" in ''|*[!a-zA-Z0-9_.-]*) return 1 ;; esac
+    tc filter del dev "$lan" ingress protocol ip pref "$PREF" >/dev/null 2>&1 || true
+    tc chain del dev "$lan" ingress chain 42001 >/dev/null 2>&1 || true
+    tc chain del dev "$lan" ingress chain 42002 >/dev/null 2>&1 || true
+    rm -f "$STATE/chain" "$STATE/device" "$STATE/fingerprint"
+}
+
+case "${1:-}" in
+    probe) probe ;;
+    ready) ready ;;
+    check)
+        ready
+        test -r "$STATE/fingerprint"
+        test "$(fingerprint)" = "$(cat "$STATE/fingerprint")"
+        lan=$(lan_device)
+        tc filter show dev "$lan" ingress chain 0 | grep -q "pref $PREF .*basic"
+        ;;
+    sync|remove)
+        lock=/var/lock/netpilot-tun.lock
+        tries=0
+        until mkdir "$lock" 2>/dev/null; do
+            tries=$((tries + 1)); [ "$tries" -lt 10 ] || exit 1; sleep 1
+        done
+        trap 'rmdir "$lock" 2>/dev/null || true' EXIT INT TERM
+        if [ "$1" = sync ]; then sync_filters; else remove_filters; fi
+        ;;
+    *) echo '用法: netpilot-tun probe|ready|check|sync|remove' >&2; exit 1 ;;
+esac

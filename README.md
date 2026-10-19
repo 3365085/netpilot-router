@@ -23,26 +23,34 @@
 | 代理 | Mihomo DNS，不应用广告域名列表 | 规则分流或全局代理 |
 | 去广告与代理 | 过滤 DNS → Mihomo DNS | 先拦截广告，再分流或全局代理 |
 
-固件支持 IPv4 策略路由时使用 TPROXY，支持 TCP / UDP。若 `ip -4 rule show` 失败，自动使用 TCP REDIRECT 兼容模式。兼容模式会拒绝代理设备的外网 UDP，QUIC 通常回退为 TCP；依赖 UDP 的游戏和应用需要支持策略路由的固件。此版本不会刷写固件或伪装成支持 UDP 透明代理。
+固件支持 IPv4 策略路由时使用 TPROXY。缺少该功能时，优先探测 **TC → TUN**：由内核 TC 按设备将公网 IPv4 TCP / UDP 送入 Mihomo 的 gVisor TUN，分别使用规则/全局与是否过滤的四个入口。DNS 仍经过对应设备的过滤链路，局域网、私有地址与组播保留原路径。这条路径不需要修改默认路由或刷固件，已在目标 SP970 的现有固件验证。当前固件缺少策略路由并不等于芯片不能运行 TUN。
+
+只有 TPROXY 和 TC → TUN 均不可用时，才退回 TCP REDIRECT。界面会明确显示 TCP 兼容模式，并拒绝代理设备的公网 UDP。接管方式显示 `TUN · TCP / UDP` 且运行状态已就绪时，表示 TUN 正常工作；远端订阅节点还必须支持 UDP。当前已有订阅的实际代理路径已验证 UDP 往返。
+
+此版本的透明代理接管 IPv4 TCP / UDP。**代理设备的公网 IPv6 继续被阻断，避免直连；没有启用 IPv6 代理。** ICMP 等未接管的公网协议在 TC → TUN 模式下也会被阻断。无法将路由器的能力延伸到不经过它的蜂窝流量。
+
+代理设备采用断线阻断：核心停止、TUN 失效或接管暂未恢复时，公网流量不会自动改成直连。procd 重启核心后，守护进程每 5 秒检查并恢复 TUN 绑定。停止 `allinone` 服务会保留设备防护；要主动使用原网络，在控制台将该设备切为“直连”。该机制控制经过路由器的路径，不提供账号风控方面的保证。
 
 去广告由 Mihomo 域名规则与两个小型 dnsmasq 实例配合完成。仅去广告的 DNS 使用直连上游；组合模式的 DNS 使用 Mihomo。界面展示实际核心 RSS，不承诺固定内存上限。
 
 ## 安装
 
-依赖：`mihomo`、`curl`、`nftables`、`ip-full`、`dnsmasq-full`、`jsonfilter`、`ucode`、`ucode-mod-fs`、`ca-bundle`。完整 TPROXY 模式还需要内核启用 `CONFIG_IP_ADVANCED_ROUTER` / `CONFIG_IP_MULTIPLE_TABLES`，并具备 `kmod-nft-tproxy` 及 `kmod-nft-socket`。
+依赖：`mihomo`、`curl`、`nftables`、`ip-full`、`dnsmasq-full`、`jsonfilter`、`ucode`、`ucode-mod-fs`、`ca-bundle`、`sha256sum`。TPROXY 模式还需要内核启用 `CONFIG_IP_ADVANCED_ROUTER` / `CONFIG_IP_MULTIPLE_TABLES`，并具备 `kmod-nft-tproxy` 及 `kmod-nft-socket`。
+
+TC → TUN 需要带 gVisor 支持的 Mihomo、`kmod-tun`、`kmod-sched-core`，以及具备 `u32`、`basic`、`gact`、`mirred`、chain 与 JSON 支持的 `tc`。目标设备现有 `tc-tiny 6.18.0` 和对应内核模块已满足条件，未额外安装软件包。能力探测在临时虚拟接口上执行，不给真实 LAN 安装测试规则。NetPilot 使用 ingress 优先级 49200 与链 42001 / 42002，其他自定义 QoS 请避开这些编号。
 
 先安装 [Mihomo 官方核心](https://github.com/MetaCubeX/mihomo/releases)，放到 `/usr/bin/mihomo` 并赋予执行权限。本项目不将失效镜像或不可执行的下载占位脚本作为核心。
 
 ```sh
-tar -xzf netpilot-router-1.2.2.tar.gz
+tar -xzf netpilot-router-1.3.0.tar.gz
 sh install.sh
 ```
 
-安装程序保留已有订阅和设备模式，在 `/root/netpilot-backup-日期时间` 保存旧文件。它会修改 uhttpd 访问控制、增加 firewall include 和每日规则更新任务，随后启动服务。失败时查看备份和日志；不会自动卸载其他代理软件。
+安装程序保留已有订阅和设备模式，在 `/root/netpilot-backup-日期时间` 保存旧文件。它会修改 uhttpd 访问控制、增加 firewall include、TUN 返回流量到 LAN 的防火墙区域和每日规则更新任务，关闭可能保留旧设备分流决定的流量卸载，随后启动服务。配置通过检查后才停止旧核心。失败时查看备份和日志；不会自动卸载其他代理软件。
 
 打开 `http://路由器IPv4地址/netpilot.html`。用户名为 `root`，密码为现有路由器密码。旧 `/net.html` 地址会跳转到新界面。订阅和修改接口均使用路由器认证，不允许跨站修改。
 
-电脑若已运行 FlClash 等本地代理，先在路由器控制台为该电脑选择“仅去广告”，避免双重接管和兼容模式的 UDP 限制影响已有客户端。要完全使用路由器代理，先退出电脑端代理，再选择“去广告＋代理”。加密 DNS 或本机代理自行解析的域名可能绕过路由器的 DNS 过滤。
+电脑若已运行 FlClash 等本地代理，先在路由器控制台为该电脑选择“仅去广告”，避免双重接管。要完全使用路由器代理，先退出电脑端代理，再选择“去广告＋代理”；iPhone 使用路由器方案时无需额外建立手机 VPN。加密 DNS 或本机代理自行解析的域名可能绕过路由器的 DNS 过滤。
 
 ## 订阅与广告规则
 
@@ -92,6 +100,7 @@ logread -e netpilot
 nft list table inet netmode
 cat /etc/allinone/backend
 cat /etc/allinone/adblock.count
+netpilot-tun check
 ```
 
 保留的用户数据位于 `/etc/allinone`：`clash_profiles.conf`、`adg_sources.conf`、`peers.conf`、`proxy_providers/`、`rule_providers/`。不要提交这些文件或路由器备份到 Git。
@@ -109,5 +118,15 @@ bash build.sh
 `dist/` 生成可在 APK / OPKG 固件上使用的文件安装包和 SHA-256 清单；它不冒充已注册的 APK/IPK。安装器保留既有用户数据，源码仓库不包含私有配置和核心二进制。
 
 实际路由器测试范围与结果见 [VALIDATION.md](VALIDATION.md)。
+
+实际传输回归使用 `tests/udp_probe.go` 和 `tests/router_transport.sh`。先交叉编译 UDP 探针，将探针和脚本复制到路由器临时目录，再以 root 执行脚本。脚本会创建并清理临时 LAN 设备；`--fault-tests` 会主动终止和停止/启动当前代理核心，影响现有代理连接，请仅在维护测试时使用。
+
+```sh
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /tmp/udp-probe tests/udp_probe.go
+# 在路由器上运行，探针路径按实际上传位置填写：
+sh router_transport.sh /tmp/udp-probe --fault-tests
+```
+
+TC → TUN 的实现依据 [Mihomo TUN listener 配置](https://wiki.metacubex.one/config/inbound/listeners/tun/) 和 [Linux mirred 实现](https://github.com/torvalds/linux/blob/v6.12/net/sched/act_mirred.c)。TC 在 LAN ingress 选中设备并将 IP 包交给 TUN，Mihomo 按原有入口子规则选择直连或共享代理节点。
 
 节点操作依据 [Mihomo API 文档](https://wiki.metacubex.one/api/)，使用固定的 `PROXY` 选择组；接口只返回节点名称、延迟和选择状态，不转发节点凭据。

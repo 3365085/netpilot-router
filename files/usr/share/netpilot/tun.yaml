@@ -1,0 +1,33 @@
+listeners:
+  - name: in-clash-rule
+    type: tun
+    device: npt-cr
+    stack: gvisor
+    mtu: 1500
+    auto-route: false
+    auto-redirect: false
+    inet4-address: [198.19.16.1/30]
+  - name: in-both-rule
+    type: tun
+    device: npt-br
+    stack: gvisor
+    mtu: 1500
+    auto-route: false
+    auto-redirect: false
+    inet4-address: [198.19.16.5/30]
+  - name: in-clash-global
+    type: tun
+    device: npt-cg
+    stack: gvisor
+    mtu: 1500
+    auto-route: false
+    auto-redirect: false
+    inet4-address: [198.19.16.9/30]
+  - name: in-both-global
+    type: tun
+    device: npt-bg
+    stack: gvisor
+    mtu: 1500
+    auto-route: false
+    auto-redirect: false
+    inet4-address: [198.19.16.13/30]

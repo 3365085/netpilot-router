@@ -18,7 +18,7 @@ let simulateBusy = false, diagnosticBusy = true;
 const diagnosticReports = [];
 const fixture = {
   ok:true, hostname:'iPhone', ip:'192.168.9.200', mac:'02:00:00:00:00:01', mode:'both', routing:'rule',
-  core_running:true, firewall_ready:true, backend:'redirect', adblock_rules:958, memory_mb:'53.9', version:'1.2.2',
+  core_running:true, firewall_ready:true, backend:'tc-tun', udp_proxy:true, tun_ready:true, adblock_rules:958, memory_mb:'53.9', version:'1.3.0',
   clash_profiles:[{id:'subscription',name:'机场订阅-1792418607',type:'http',value:'https://example.com/sub?token=fixture',active:true}],
   adg_sources:[{id:'filter',name:'秋风广告规则 AWAvenue',type:'http',format:'yaml',value:'https://example.com/filter.yaml',enabled:true}],
   node_selection:{available:true,selected:'AUTO',current:'VLESS-REALITY',scope:'router',nodes:[
@@ -148,6 +148,11 @@ try {
   assert.equal(await cdp.evaluate('Array.from(document.querySelectorAll("[data-mode]")).every(e=>e.getBoundingClientRect().height>=44)'),true,'Small mode touch targets');
   assert.equal(await cdp.evaluate('Array.from(document.querySelectorAll("#app p,#app h1,#app h2,#app .row-title")).some(e=>/满血|极速|毫秒|100%|强制|零损耗/.test(e.textContent))'),false);
   if (!process.env.LIVE_URL) {
+    assert.equal(await cdp.evaluate('document.getElementById("backendValue").textContent'),'TUN · TCP / UDP');
+    assert.equal(await cdp.evaluate('document.getElementById("backendNote").hidden'),true);
+    fixture.backend='redirect';await cdp.evaluate('refresh(false)');
+    assert.equal(await cdp.evaluate('document.getElementById("backendNote").hidden'),false);
+    fixture.backend='tc-tun';await cdp.evaluate('refresh(false)');
     assert.equal(await cdp.evaluate('document.getElementById("subscriptionSummary").textContent'),'订阅 1');
     assert.equal(await cdp.evaluate('Array.from(document.querySelectorAll("#app *")).filter(e=>e.children.length===0).some(e=>e.textContent.includes("example.com/sub"))'),false);
     simulateBusy=true;
