@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>NetPilot 连接检查</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light dark;--bg:#f2f2f7;--card:#fff;--text:#111;--secondary:#6c6c70;--line:rgba(60,60,67,.16);--blue:#007aff}
+    @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--text:#fff;--secondary:#98989e;--line:rgba(84,84,88,.6);--blue:#0a84ff}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}main{max-width:560px;margin:auto;padding:calc(24px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}h1{font-size:28px;margin:18px 0 8px}p{color:var(--secondary);font-size:14px;line-height:1.6}a{color:var(--blue);text-decoration:none}.card{background:var(--card);border-radius:14px;margin:20px 0;overflow:hidden}.row{padding:14px 16px;display:flex;align-items:center;gap:12px;min-height:56px}.row+.row{border-top:.5px solid var(--line)}.copy{flex:1;min-width:0}.host{font-size:14px;overflow-wrap:anywhere}.note{font-size:12px;color:var(--secondary);margin-top:4px}.result{font-size:13px;flex-shrink:0}button{width:100%;min-height:48px;border:0;border-radius:12px;font:inherit;font-size:17px;color:#fff;background:var(--blue)}button:disabled{opacity:.5}:focus-visible{outline:3px solid var(--blue);outline-offset:3px}.status{min-height:24px;color:var(--text)}
+  </style>
+</head>
+<body><main>
+  <a href="/netpilot.html">返回 NetPilot</a>
+  <h1>浏览器连接检查</h1>
+  <p id="device">正在读取设备模式…</p>
+  <div class="card" id="results"></div>
+  <p>每次使用新的地址发出请求，排除旧响应缓存。连接失败也可能来自网络错误，需结合路由器日志判断。检查结果会保存到路由器。</p>
+  <button id="run" type="button">重新检查</button>
+  <p id="status" class="status" role="status"></p>
+</main><script>
+  const targets = [
+    ['ad.doubleclick.net','广告域名'],['pagead2.googlesyndication.com','广告域名'],
+    ['mi.gdt.qq.com','国内广告域名'],['mobads.baidu.com','国内广告域名'],
+    ['www.baidu.com','正常网站对照'],['www.qq.com','正常网站对照'],['www.apple.com','正常网站对照']
+  ];
+  const rows=[];
+  for(const [host,note] of targets){
+    const row=document.createElement('div');row.className='row';
+    const copy=document.createElement('div');copy.className='copy';
+    const name=document.createElement('div');name.className='host';name.textContent=host;
+    const desc=document.createElement('div');desc.className='note';desc.textContent=note;
+    const result=document.createElement('span');result.className='result';result.textContent='等待';
+    copy.append(name,desc);row.append(copy,result);document.getElementById('results').append(row);rows.push(result);
+  }
+  const names={direct:'直连',adg:'仅去广告',clash:'仅代理',both:'去广告与代理'};
+  let running=false;
+  async function api(url,options){
+    for(let attempt=0;attempt<8;attempt++){
+      const response=await fetch(url,options),data=await response.json();
+      if(data.ok)return data;
+      if(data.code!=='busy')throw new Error(data.message||'路由器请求失败');
+      await new Promise(resolve=>setTimeout(resolve,300));
+    }
+    throw new Error('路由器正在应用修改，请稍后重新检查');
+  }
+  async function run(){
+    if(running)return;running=true;document.getElementById('run').disabled=true;
+    const status=document.getElementById('status');status.textContent='正在检查…';
+    const nonce=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+    const report={nonce,user_agent:navigator.userAgent,started_at:new Date().toISOString(),results:[]};
+    try{
+      const state=await api('/cgi-bin/netpilot?mode=status',{credentials:'same-origin',cache:'no-store'});
+      document.getElementById('device').textContent=state.ip+' · '+(names[state.mode]||state.mode);
+      for(let i=0;i<targets.length;i++){
+        const host=targets[i][0],start=performance.now(),controller=new AbortController();
+        const timer=setTimeout(()=>controller.abort(),6000);rows[i].textContent='检查中';
+        const item={host,outcome:'failed',response_type:'',error:'',elapsed_ms:0};
+        try{
+          const response=await fetch('https://'+host+'/_netpilot_filter_check?nonce='+nonce,{method:'HEAD',mode:'no-cors',credentials:'omit',cache:'no-store',redirect:'follow',signal:controller.signal});
+          item.outcome='connected';item.response_type=response.type;rows[i].textContent='请求连通';
+        }catch(error){item.error=error.name+': '+error.message;rows[i].textContent='连接失败'}
+        finally{clearTimeout(timer);item.elapsed_ms=Math.round(performance.now()-start);report.results.push(item)}
+      }
+      const data=JSON.stringify(report),bytes=new TextEncoder().encode(data);let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);
+      await api('/cgi-bin/netpilot?action=record_diagnostic',{method:'POST',credentials:'same-origin',body:btoa(binary)});
+      status.textContent='检查完成，结果已保存。编号 '+nonce;
+    }catch(error){status.textContent=error.message||'检查失败，请重试'}
+    finally{running=false;document.getElementById('run').disabled=false}
+  }
+  document.getElementById('run').addEventListener('click',run);run();
+</script></body></html>

@@ -13,7 +13,7 @@ stamp=$(date +%Y%m%d-%H%M%S)
 backup="/root/netpilot-backup-$stamp"
 mkdir -p "$backup"
 chmod 700 "$backup"
-for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.html /www/netpilot.html /usr/lib/netpilot /usr/share/netpilot /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes /etc/config/firewall /etc/config/uhttpd /etc/httpd.conf; do
+for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.html /www/netpilot.html /www/netpilot-diagnostic.html /usr/lib/netpilot /usr/share/netpilot /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes /usr/sbin/netpilot-connections /etc/config/firewall /etc/config/uhttpd /etc/httpd.conf; do
     if [ -e "$path" ]; then
         mkdir -p "$backup$(dirname "$path")"
         cp -a "$path" "$backup$path"
@@ -21,8 +21,8 @@ for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.htm
 done
 if [ -x /etc/init.d/allinone ]; then /etc/init.d/allinone stop || true; fi
 cp -R files/. /
-chmod 755 /etc/init.d/allinone /etc/hotplug.d/dhcp/99-netmode /www/cgi-bin/netmode /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes
-chmod 644 /www/netpilot.html /usr/share/netpilot/base.yaml /usr/lib/netpilot/config.sh
+chmod 755 /etc/init.d/allinone /etc/hotplug.d/dhcp/99-netmode /www/cgi-bin/netmode /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes /usr/sbin/netpilot-connections
+chmod 644 /www/netpilot.html /www/netpilot-diagnostic.html /usr/share/netpilot/base.yaml /usr/lib/netpilot/config.sh
 ln -sf netmode /www/cgi-bin/netpilot
 cat > /www/net.html <<'EOF'
 <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/netpilot.html"><title>NetPilot 网络助手</title><a href="/netpilot.html">打开 NetPilot 网络助手</a></html>
@@ -40,7 +40,7 @@ chmod 600 /etc/allinone/*.conf
 # Protect subscriptions and all mode changes with the router password. $p$root
 # asks uhttpd to check the existing system password; no password is copied here.
 touch /etc/httpd.conf
-for route in /cgi-bin/netmode /cgi-bin/netpilot /net.html /netpilot.html; do
+for route in /cgi-bin/netmode /cgi-bin/netpilot /net.html /netpilot.html /netpilot-diagnostic.html; do
     grep -Fq "$route:" /etc/httpd.conf || printf '%s:root:$p$root\n' "$route" >> /etc/httpd.conf
 done
 uci set uhttpd.main.config=/etc/httpd.conf

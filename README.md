@@ -12,6 +12,8 @@
 
 **所选节点由所有代理设备共用。** 设备模式、规则/全局分流仍分别保存。节点切换用于新连接，已建立的连接可继续使用原节点。
 
+设备模式或规则/全局设置发生变化时，会关闭当前设备已经建立的 Mihomo 代理连接，使其按新设置重新连接。不会关闭其他设备的代理连接；直接转发的旧连接和浏览器自身的 DNS 缓存不在此操作范围内。关闭失败时界面会提示重新连接此设备网络。
+
 ## 模式
 
 | 设备模式 | DNS | 数据流量 |
@@ -32,7 +34,7 @@
 先安装 [Mihomo 官方核心](https://github.com/MetaCubeX/mihomo/releases)，放到 `/usr/bin/mihomo` 并赋予执行权限。本项目不将失效镜像或不可执行的下载占位脚本作为核心。
 
 ```sh
-tar -xzf netpilot-router-1.2.1.tar.gz
+tar -xzf netpilot-router-1.2.2.tar.gz
 sh install.sh
 ```
 
@@ -70,9 +72,13 @@ https://gcore.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenu
 
 规则默认每天 04:23 更新。下载失败时保留缓存；无可用规则或配置验证失败时返回错误，不报告已成功应用。配置通过 Mihomo 和 dnsmasq 检查后才替换运行文件。
 
-规则源的开关是全路由器共用的；首页模式决定当前设备是否使用它们。界面会分别显示“此设备已启用”和“此设备未启用”。若页面仍有广告，先看当前设备模式，再考虑旧 DNS 缓存、加密 DNS / 本机代理，以及与正文共用域名的广告。
+规则源的开关是全路由器共用的；首页模式决定当前设备是否使用它们。界面会分别显示“此设备已启用”和“此设备未启用”。规则数量和 DNS 返回 NXDOMAIN 只能证明过滤链路中的相应环节生效，不能代替实际浏览器请求的验证。
 
 在 `https://adblock.turtlecute.org` 的实际对照结果与方法见 [VALIDATION.md](VALIDATION.md)。DNS 过滤可拦截广告 SDK 使用的独立域名，但不能保证去掉所有开屏、插屏或全屏广告；页面元素隐藏和同域路径过滤需要设备端内容过滤支持。
+
+**当前实体 iPhone 的 Safari 仍报告约 16%，原因正在排查。** 文档中的 92% 来自路由器上隔离的 Chrome 测试设备，不能当作这台 iPhone 的结果。用户已确认测试时未运行其他代理。
+
+排查时可在同一浏览器打开 `http://路由器IPv4地址/netpilot-diagnostic.html`。页面对固定的 4 个广告域名和 3 个正常网站域名发送新的 HEAD 请求，结果仅保存在路由器 `/tmp/netpilot-diagnostic-设备IPv4地址.json`，重启后消失。连接失败可能来自过滤或普通网络错误，需与 DNS 和流量日志一起判断；页面不会修改设备模式。
 
 ## 运维
 
@@ -93,6 +99,7 @@ cat /etc/allinone/adblock.count
 ```sh
 bash tests/test_domains.sh
 sh tests/test_nodes.sh  # 需要 ucode 和 jsonfilter，也可在路由器上运行
+sh tests/test_connections.sh  # 需要 ucode，验证按设备关闭旧连接的筛选
 node tests/ui.mjs      # Linux + Node.js 22+ + Chrome；CHROME_BIN 可指定浏览器路径
 bash build.sh
 ```

@@ -1,0 +1,55 @@
+{
+  "before": [
+    {
+      "time": 1792434270616,
+      "mode": "proxy-before",
+      "blocked": 11,
+      "total": 132
+    },
+    {
+      "time": 1792434281682,
+      "mode": "both-existing-session",
+      "blocked": 17,
+      "total": 132
+    },
+    {
+      "time": 1792434328164,
+      "mode": "both-closed-connections",
+      "blocked": 121,
+      "total": 132
+    },
+    {
+      "time": 1792434332880,
+      "mode": "both-cleared-cache",
+      "blocked": 121,
+      "total": 132
+    }
+  ],
+  "after": [
+    {
+      "time": 1792434723332,
+      "mode": "proxy-before",
+      "blocked": 10,
+      "total": 132
+    },
+    {
+      "time": 1792434735198,
+      "mode": "both-existing-session",
+      "blocked": 121,
+      "total": 132
+    },
+    {
+      "time": 1792434747714,
+      "mode": "both-closed-connections",
+      "blocked": 121,
+      "total": 132
+    },
+    {
+      "time": 1792434762180,
+      "mode": "both-cleared-cache",
+      "blocked": 121,
+      "total": 132
+    }
+  ],
+  "scope": "Same isolated LAN Chrome session; not the physical iPhone Safari."
+}

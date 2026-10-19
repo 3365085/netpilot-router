@@ -507,10 +507,28 @@ trap 'rmdir "$API_LOCK" 2>/dev/null || true' EXIT INT TERM
 
 get_client_info "$CLIENT_IP"
 get_device_state "$CLIENT_IP" "$CLIENT_MAC"
+PREVIOUS_MODE="$DEV_MODE"
+PREVIOUS_ROUTING="$DEV_ROUTING"
 ACTION_MSG="已刷新"
 NODES_JSON=""
+CONNECTIONS_RESET=0
+CONNECTION_RESET_OK=null
 
-if [ "$REQ_ACTION" = select_node ] || [ "$REQ_ACTION" = check_nodes ]; then
+if [ "$REQ_ACTION" = record_diagnostic ]; then
+    [ "${CONTENT_LENGTH:-0}" -le 32768 ] || api_error '检查结果过大'
+    umask 077
+    diagnostic_input=$(mktemp /tmp/netpilot-diagnostic-input.XXXXXX) || api_error '无法保存检查结果'
+    diagnostic_output=$(mktemp /tmp/netpilot-diagnostic-output.XXXXXX) || { rm -f "$diagnostic_input"; api_error '无法保存检查结果'; }
+    b64_decode > "$diagnostic_input"
+    if ! ucode /usr/lib/netpilot/diagnostic.uc "$diagnostic_input" "$CLIENT_IP" "$DEV_MODE" "$DEV_ROUTING" > "$diagnostic_output"; then
+        rm -f "$diagnostic_input" "$diagnostic_output"; api_error '检查结果格式不正确'
+    fi
+    if ! mv "$diagnostic_output" "/tmp/netpilot-diagnostic-$CLIENT_IP.json"; then
+        rm -f "$diagnostic_input" "$diagnostic_output"; api_error '无法保存检查结果'
+    fi
+    rm -f "$diagnostic_input"
+    ACTION_MSG="检查结果已保存"
+elif [ "$REQ_ACTION" = select_node ] || [ "$REQ_ACTION" = check_nodes ]; then
     node_result="/tmp/netpilot-node-result.$$"
     if [ "$REQ_ACTION" = select_node ]; then
         [ "${CONTENT_LENGTH:-0}" -le 4096 ] || api_error '节点名称过长'
@@ -573,6 +591,18 @@ fi
 if [ "$CHANGED" -eq 1 ]; then
     apply_device_state "$CLIENT_IP" "$CLIENT_MAC" "$DEV_MODE" "$DEV_ROUTING" "$CLIENT_HOST" || api_error "防火墙未就绪，未能切换设备模式"
     chmod 600 "$PEERS_FILE"
+    if [ "$PREVIOUS_MODE|$PREVIOUS_ROUTING" != "$DEV_MODE|$DEV_ROUTING" ]; then
+        if CONNECTIONS_RESET=$(/usr/sbin/netpilot-connections "$CLIENT_IP" 2>/dev/null); then
+            CONNECTION_RESET_OK=true
+        else
+            CONNECTION_RESET_OK=false
+            ACTION_MSG="$ACTION_MSG；旧连接未完全关闭，请重连此设备网络"
+        fi
+        case "$CONNECTIONS_RESET" in ''|*[!0-9]*) CONNECTIONS_RESET=0 ;; esac
+        if [ "$CONNECTION_RESET_OK" = true ] && [ "$CONNECTIONS_RESET" -gt 0 ]; then
+            ACTION_MSG="$ACTION_MSG（旧连接已重建）"
+        fi
+    fi
 fi
 
 get_core_metrics
@@ -613,7 +643,9 @@ cat <<EOF
   "clash_profiles": ${CLASH_JSON},
   "adg_sources": ${ADG_JSON},
   "node_selection": ${NODES_JSON},
-  "version": "1.2.1",
+  "connections_reset": ${CONNECTIONS_RESET},
+  "connection_reset_ok": ${CONNECTION_RESET_OK},
+  "version": "1.2.2",
   "ipv6_leak_guard": true,
   "sniffer": true,
   "message": "${SAFE_MSG}"

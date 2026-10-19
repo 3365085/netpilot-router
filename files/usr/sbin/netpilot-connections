@@ -1,0 +1,25 @@
+#!/bin/sh
+# A mode change only affects new NAT flows. Close this client's old Mihomo
+# connections so keep-alive / HTTP/2 streams reconnect through the new listener.
+set -eu
+API="${NETPILOT_MIHOMO_API:-http://127.0.0.1:9090}"
+LIB="${NETPILOT_LIB_DIR:-/usr/lib/netpilot}"
+[ "$#" = 1 ] || exit 1
+work=$(mktemp -d /tmp/netpilot-connections.XXXXXX)
+chmod 700 "$work"
+trap 'rm -rf "$work"' EXIT INT TERM
+curl -fsS --connect-timeout 1 --max-time 3 "$API/connections" -o "$work/state.json" 2>/dev/null || exit 1
+ucode "$LIB/connections.uc" "$work/state.json" "$1" > "$work/ids" || exit 1
+closed=0
+failed=0
+deadline=$(($(date +%s) + 10))
+while IFS= read -r id; do
+    if [ "$(date +%s)" -ge "$deadline" ]; then failed=1; break; fi
+    if curl -fsS --connect-timeout 1 --max-time 1 -X DELETE "$API/connections/$id" -o /dev/null 2>/dev/null; then
+        closed=$((closed + 1))
+    else
+        failed=1
+    fi
+done < "$work/ids"
+printf '%s\n' "$closed"
+[ "$failed" = 0 ]

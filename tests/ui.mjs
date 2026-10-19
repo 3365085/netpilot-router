@@ -14,10 +14,11 @@ await fs.mkdir(output, {recursive:true});
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const profile = await fs.mkdtemp(path.join(os.tmpdir(), 'netpilot-chrome-'));
 const errors = [], requests = [];
-let simulateBusy = false;
+let simulateBusy = false, diagnosticBusy = true;
+const diagnosticReports = [];
 const fixture = {
   ok:true, hostname:'iPhone', ip:'192.168.9.200', mac:'02:00:00:00:00:01', mode:'both', routing:'rule',
-  core_running:true, firewall_ready:true, backend:'redirect', adblock_rules:958, memory_mb:'53.9', version:'1.2.1',
+  core_running:true, firewall_ready:true, backend:'redirect', adblock_rules:958, memory_mb:'53.9', version:'1.2.2',
   clash_profiles:[{id:'subscription',name:'机场订阅-1792418607',type:'http',value:'https://example.com/sub?token=fixture',active:true}],
   adg_sources:[{id:'filter',name:'秋风广告规则 AWAvenue',type:'http',format:'yaml',value:'https://example.com/filter.yaml',enabled:true}],
   node_selection:{available:true,selected:'AUTO',current:'VLESS-REALITY',scope:'router',nodes:[
@@ -88,7 +89,13 @@ try {
         }
         if (req.method==='POST') {
           const action=url.searchParams.get('action');
-          if (action==='select_node') {
+          if (action==='record_diagnostic') {
+            if (diagnosticBusy) {
+              diagnosticBusy=false;
+              res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:false,code:'busy',message:'busy'}));return;
+            }
+            diagnosticReports.push(JSON.parse(Buffer.from(body,'base64').toString('utf8')));
+          } else if (action==='select_node') {
             const name=Buffer.from(body,'base64').toString('utf8');
             if (!fixture.node_selection.nodes.some(n=>n.name===name)) {
               res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:false,message:'节点切换失败'}));return;
@@ -106,6 +113,8 @@ try {
         res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(fixture));
       } else if (url.pathname==='/'||url.pathname==='/netpilot.html') {
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});res.end(await fs.readFile(path.join(root,'files/www/netpilot.html')));
+      } else if (url.pathname==='/netpilot-diagnostic.html') {
+        res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});res.end(await fs.readFile(path.join(root,'files/www/netpilot-diagnostic.html')));
       } else {res.writeHead(404);res.end();}
     });
     await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -239,6 +248,33 @@ try {
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});
   await cdp.evaluate('window.scrollTo(0,0)');await cdp.screenshot('ios-light.png');
+  if (!process.env.LIVE_URL) {
+    await cdp.send('Page.addScriptToEvaluateOnNewDocument',{source:`
+      const originalFetch=window.fetch;
+      window.diagnosticRequests=[];
+      window.fetch=async function(input,options){
+        if(typeof input==='string'&&input.includes('/_netpilot_filter_check?')){
+          window.diagnosticRequests.push({url:input,method:options.method,mode:options.mode,credentials:options.credentials,cache:options.cache});
+          if(!new URL(input).hostname.startsWith('www.'))throw new TypeError('Failed to fetch');
+          return new Response(null,{status:200});
+        }
+        return originalFetch(input,options);
+      };
+    `});
+    await cdp.send('Page.navigate',{url:base+'/netpilot-diagnostic.html'});
+    await cdp.wait('document.getElementById("status")?.textContent.includes("结果已保存")');
+    assert.equal(diagnosticReports.length,1,'Diagnostic upload did not retry busy response');
+    assert.equal(diagnosticReports[0].results.length,7);
+    assert.equal(diagnosticReports[0].results.filter(item=>item.outcome==='failed').length,4);
+    assert.equal(diagnosticReports[0].results.filter(item=>item.outcome==='connected').length,3);
+    const probes=await cdp.evaluate('window.diagnosticRequests');
+    assert(probes.every(p=>p.mode==='no-cors'&&p.method==='HEAD'&&p.credentials==='omit'&&p.cache==='no-store'));
+    assert.equal(await cdp.evaluate('document.documentElement.scrollWidth<=innerWidth'),true,'Diagnostic page overflow');
+    await cdp.tap('#run');
+    await cdp.wait('document.getElementById("status").textContent.includes("结果已保存")');
+    assert.equal(diagnosticReports.length,2);
+    assert.notEqual(diagnosticReports[0].nonce,diagnosticReports[1].nonce,'Diagnostic reused previous request address');
+  }
   assert.equal(errors.length,0,errors.join('\n'));
   console.log('PASS: phone/desktop layouts, dark/light themes, modal focus, source-sheet header positions and touch Done'+(process.env.LIVE_URL?' (live router)':', node selection/search, POST actions and failed-import recovery'));
   console.log('Screenshots: '+output);
