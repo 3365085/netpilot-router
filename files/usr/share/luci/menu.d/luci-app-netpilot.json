@@ -1,0 +1,13 @@
+{
+  "admin/services/netpilot": {
+    "title": "NetPilot 网络助手",
+    "order": 65,
+    "action": {
+      "type": "view",
+      "path": "netpilot/overview"
+    },
+    "depends": {
+      "fs": { "/etc/init.d/allinone": "executable" }
+    }
+  }
+}

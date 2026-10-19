@@ -1,0 +1,15 @@
+*.ipk
+*.apk
+*.tar.gz
+dist/
+.build/
+*.log
+*.db
+router-backup/
+.router-session/
+config.yaml
+clash_profiles.conf
+adg_sources.conf
+peers.conf
+proxy_providers/
+rule_providers/

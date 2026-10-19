@@ -1,0 +1,609 @@
+#!/bin/sh
+# ==============================================================================
+# /www/cgi-bin/netmode - 局域网按设备独立分流 & 多订阅/多规则管理 CGI 接口
+# 核心功能：
+#   1. 按设备 ($REMOTE_ADDR / MAC) 独立切换 4 种模式 (direct|adg|clash|both) 与 (rule|global)
+#   2. Clash 规则管理：支持添加多个订阅链接或本地 YAML，每次单选激活 1 个生效
+#      - action=add_clash_url&name=...    (POST Base64 URL)
+#      - action=upload_clash&name=...&filename=... (POST Base64 File)
+#      - action=select_clash&id=...       (GET 切换当前激活的 Clash 规则)
+#      - action=del_clash&id=...          (GET 删除指定 Clash 规则)
+#   3. AdGuard 规则管理：支持添加多个规则订阅链接或本地规则文件，支持多选同时生效叠加拦截
+#      - action=add_adg_url&name=...      (POST Base64 URL)
+#      - action=upload_adg&name=...&filename=... (POST Base64 File)
+#      - action=toggle_adg&id=...         (GET 启用/停用某个 AdGuard 规则源)
+#      - action=del_adg&id=...            (GET 删除指定 AdGuard 规则源)
+# ==============================================================================
+
+echo "Content-Type: application/json; charset=utf-8"
+echo "Cache-Control: no-store, no-cache, must-revalidate, max-age=0"
+echo ""
+
+NFT_TABLE="netmode"
+CONF_DIR="${NETMODE_CONF_DIR:-/etc/allinone}"
+CONF_FILE="${CONF_DIR}/config.yaml"
+PEERS_FILE="${CONF_DIR}/peers.conf"
+CLASH_LIST_FILE="${CONF_DIR}/clash_profiles.conf"
+ADG_LIST_FILE="${CONF_DIR}/adg_sources.conf"
+MIHOMO_API="http://127.0.0.1:9090"
+
+mkdir -p "$CONF_DIR/proxy_providers" "$CONF_DIR/rule_providers" 2>/dev/null || true
+if [ -w "$CONF_DIR" ] || [ ! -e "$CONF_DIR" ]; then
+    [ -f "$PEERS_FILE" ] || touch "$PEERS_FILE" 2>/dev/null || true
+    if [ ! -f "$CLASH_LIST_FILE" ]; then
+        cat > "$CLASH_LIST_FILE" 2>/dev/null <<'EOF' || true
+
+EOF
+    fi
+    if [ ! -f "$ADG_LIST_FILE" ]; then
+        cat > "$ADG_LIST_FILE" 2>/dev/null <<'EOF' || true
+adg_awavenue|秋风广告规则 AWAvenue|http|yaml|https://gcore.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.yaml|1
+EOF
+    fi
+fi
+
+parse_query() {
+    local key="$1"
+    echo "$QUERY_STRING" | tr '&' '\n' | awk -F'=' -v k="$key" '$1 == k {print $2; exit}' | sed 's/[^a-zA-Z0-9_.-]//g'
+}
+
+REQ_MODE=$(parse_query "mode")
+REQ_ROUTING=$(parse_query "routing")
+REQ_ACTION=$(parse_query "action")
+REQ_ID=$(parse_query "id")
+REQ_NAME_B64=$(parse_query "name_b64")
+REQ_FILENAME=$(parse_query "filename")
+OVERRIDE_IP=$(parse_query "ip")
+
+CLIENT_IP="${REMOTE_ADDR:-}"
+CLIENT_IP="${CLIENT_IP#::ffff:}"
+if [ -z "$CLIENT_IP" ] && [ -n "$OVERRIDE_IP" ]; then
+    CLIENT_IP="$OVERRIDE_IP"
+fi
+[ -z "$CLIENT_IP" ] && CLIENT_IP="192.168.1.100"
+
+b64_decode() {
+    if command -v base64 >/dev/null 2>&1; then
+        base64 -d 2>/dev/null || base64 -d -i 2>/dev/null
+    elif command -v openssl >/dev/null 2>&1; then
+        openssl base64 -d -A 2>/dev/null
+    fi
+}
+
+decode_name() {
+    local fallback="$1"
+    if [ -n "$REQ_NAME_B64" ]; then
+        local n
+        n=$(echo "$REQ_NAME_B64" | tr '_-' '/+' | b64_decode | tr -d '|\r\n')
+        [ -n "$n" ] && { echo "$n"; return; }
+    fi
+    echo "$fallback"
+}
+
+json_escape() {
+    echo "$1" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\r\n'
+}
+
+# 根据 CLASH_LIST_FILE (单选生效) 与 ADG_LIST_FILE (多选叠加生效) 动态生成 config.yaml 并热重载 Mihomo
+rebuild_config_yaml() {
+    local log="/tmp/netpilot-apply.$$"
+    if ! /usr/sbin/netpilot-rebuild --apply > "$log" 2>&1; then
+        SOURCE_FAILED=1
+        SOURCE_ERROR=$(head -1 "$log")
+    fi
+    rm -f "$log"
+}
+
+normalize_adg_text_file() {
+    ( . /usr/lib/netpilot/config.sh; netpilot_domains "$1" > "$2" )
+}
+
+normalize_clash_yaml_file() {
+    local src="$1"
+    local dst="$2"
+    if grep -q "^proxies:" "$src" 2>/dev/null && grep -Eq "^(rules|proxy-groups|dns|mixed-port|port):" "$src" 2>/dev/null; then
+        awk '
+            /^proxies:[ \t]*$/ { in_proxies=1; print "proxies:"; next }
+            in_proxies && /^[a-zA-Z0-9_-]+:/ { in_proxies=0 }
+            in_proxies { print $0 }
+        ' "$src" > "$dst"
+    else
+        cp "$src" "$dst"
+    fi
+}
+
+handle_source_actions() {
+    local action="$1"
+    local now_id
+    now_id=$(date +%s 2>/dev/null || echo "$$")
+
+    case "$action" in
+        add_clash_url)
+            local raw_body="/tmp/cgi_post.$$"
+            cat > "$raw_body"
+            local url
+            url=$(cat "$raw_body" | b64_decode | tr -d '\r\n ')
+            rm -f "$raw_body"
+            if [ -n "$url" ]; then
+                local cid="clash_${now_id}_$$"
+                local cname
+                cname=$(decode_name "Clash订阅-${now_id}")
+                local tmp="/tmp/clash_list.$$"
+                # 将此前所有规则设为非激活 (0)，新添加的规则直接设为当前激活 (1)
+                if [ -f "$CLASH_LIST_FILE" ]; then
+                    awk -F'|' 'NF>=5 {print $1 "|" $2 "|" $3 "|" $4 "|0"}' "$CLASH_LIST_FILE" > "$tmp"
+                else
+                    : > "$tmp"
+                fi
+                echo "${cid}|${cname}|http|${url}|1" >> "$tmp"
+                mv "$tmp" "$CLASH_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已添加并切换生效 Clash 订阅：${cname}"
+            fi
+            ;;
+
+        upload_clash)
+            local raw_body="/tmp/cgi_post.$$"
+            local tmp_up="/tmp/clash_up.$$"
+            cat > "$raw_body"
+            cat "$raw_body" | b64_decode > "$tmp_up"
+            rm -f "$raw_body"
+            if [ -s "$tmp_up" ]; then
+                local cid="clash_${now_id}_$$"
+                local fname="${REQ_FILENAME:-config.yaml}"
+                local cname
+                cname=$(decode_name "$fname")
+                local rel_path="./proxy_providers/${cid}.yaml"
+                normalize_clash_yaml_file "$tmp_up" "$CONF_DIR/proxy_providers/${cid}.yaml"
+                local tmp="/tmp/clash_list.$$"
+                if [ -f "$CLASH_LIST_FILE" ]; then
+                    awk -F'|' 'NF>=5 {print $1 "|" $2 "|" $3 "|" $4 "|0"}' "$CLASH_LIST_FILE" > "$tmp"
+                else
+                    : > "$tmp"
+                fi
+                echo "${cid}|${cname}|file|${rel_path}|1" >> "$tmp"
+                mv "$tmp" "$CLASH_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已上传并切换生效 Clash 配置：${cname}"
+            fi
+            rm -f "$tmp_up"
+            ;;
+
+        select_clash)
+            if [ -n "$REQ_ID" ] && [ -f "$CLASH_LIST_FILE" ]; then
+                local tmp="/tmp/clash_list.$$"
+                awk -F'|' -v target="$REQ_ID" '
+                    NF>=5 {
+                        act = ($1 == target) ? "1" : "0"
+                        print $1 "|" $2 "|" $3 "|" $4 "|" act
+                    }
+                ' "$CLASH_LIST_FILE" > "$tmp" && mv "$tmp" "$CLASH_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已切换当前生效的 Clash 规则"
+            fi
+            ;;
+
+        del_clash)
+            if [ -n "$REQ_ID" ] && [ -f "$CLASH_LIST_FILE" ]; then
+                local total
+                total=$(grep -c "|" "$CLASH_LIST_FILE" 2>/dev/null || echo 0)
+                if [ "$total" -le 1 ]; then
+                    ACTION_MSG="至少需保留 1 条 Clash 规则"
+                else
+                    local tmp="/tmp/clash_list.$$"
+                    awk -F'|' -v target="$REQ_ID" 'NF>=5 && $1 != target {print $0}' "$CLASH_LIST_FILE" > "$tmp"
+                    # 若删除了原本激活的项，自动将第一项设为激活 (1)
+                    if ! awk -F'|' '$5 == "1" {found=1} END {exit !found}' "$tmp"; then
+                        awk -F'|' 'NR==1 {$5="1"} {print $1 "|" $2 "|" $3 "|" $4 "|" $5}' "$tmp" > "${tmp}.2" && mv "${tmp}.2" "$tmp"
+                    fi
+                    mv "$tmp" "$CLASH_LIST_FILE"
+                    rm -f "$CONF_DIR/proxy_providers/${REQ_ID}.yaml" 2>/dev/null
+                    rebuild_config_yaml
+                    ACTION_MSG="已删除该 Clash 规则"
+                fi
+            fi
+            ;;
+
+        add_adg_url)
+            local raw_body="/tmp/cgi_post.$$"
+            cat > "$raw_body"
+            local url
+            url=$(cat "$raw_body" | b64_decode | tr -d '\r\n ')
+            rm -f "$raw_body"
+            if [ -n "$url" ]; then
+                local aid="adg_${now_id}_$$"
+                local aname
+                aname=$(decode_name "去广告规则-${now_id}")
+                local fmt="text"
+                case "$url" in
+                    *.yaml|*.yml) fmt="yaml" ;;
+                    *.txt|*.conf|*.list) fmt="text" ;;
+                    *.mrs) fmt="mrs" ;;
+                    *) fmt="text" ;;
+                esac
+                echo "${aid}|${aname}|http|${fmt}|${url}|1" >> "$ADG_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已添加并启用去广告规则订阅：${aname}"
+            fi
+            ;;
+
+        upload_adg)
+            local raw_body="/tmp/cgi_post.$$"
+            local tmp_up="/tmp/adg_up.$$"
+            cat > "$raw_body"
+            cat "$raw_body" | b64_decode > "$tmp_up"
+            rm -f "$raw_body"
+            if [ -s "$tmp_up" ]; then
+                local aid="adg_${now_id}_$$"
+                local fname="${REQ_FILENAME:-adrules.txt}"
+                local aname
+                aname=$(decode_name "$fname")
+                local fmt="text"
+                local rel_path=""
+                case "$fname" in
+                    *.mrs)
+                        fmt="mrs"
+                        rel_path="./rule_providers/${aid}.mrs"
+                        cp "$tmp_up" "$CONF_DIR/rule_providers/${aid}.mrs"
+                        ;;
+                    *.yaml|*.yml)
+                        fmt="yaml"
+                        rel_path="./rule_providers/${aid}.yaml"
+                        cp "$tmp_up" "$CONF_DIR/rule_providers/${aid}.yaml"
+                        ;;
+                    *)
+                        fmt="text"
+                        rel_path="./rule_providers/${aid}.txt"
+                        normalize_adg_text_file "$tmp_up" "$CONF_DIR/rule_providers/${aid}.txt"
+                        ;;
+                esac
+                echo "${aid}|${aname}|file|${fmt}|${rel_path}|1" >> "$ADG_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已上传并叠加启用去广告规则：${aname}"
+            fi
+            rm -f "$tmp_up"
+            ;;
+
+        toggle_adg)
+            if [ -n "$REQ_ID" ] && [ -f "$ADG_LIST_FILE" ]; then
+                local tmp="/tmp/adg_list.$$"
+                awk -F'|' -v target="$REQ_ID" '
+                    NF>=6 {
+                        en = $6
+                        if ($1 == target) en = ($6 == "1" ? "0" : "1")
+                        print $1 "|" $2 "|" $3 "|" $4 "|" $5 "|" en
+                    }
+                ' "$ADG_LIST_FILE" > "$tmp" && mv "$tmp" "$ADG_LIST_FILE"
+                rebuild_config_yaml
+                ACTION_MSG="已更新 去广告规则启用状态"
+            fi
+            ;;
+
+        del_adg)
+            if [ -n "$REQ_ID" ] && [ -f "$ADG_LIST_FILE" ]; then
+                local tmp="/tmp/adg_list.$$"
+                awk -F'|' -v target="$REQ_ID" 'NF>=6 && $1 != target {print $0}' "$ADG_LIST_FILE" > "$tmp" && mv "$tmp" "$ADG_LIST_FILE"
+                rm -f "$CONF_DIR/rule_providers/${REQ_ID}".* 2>/dev/null
+                rebuild_config_yaml
+                ACTION_MSG="已删除该去广告规则源"
+            fi
+            ;;
+    esac
+}
+
+get_client_info() {
+    local ip="$1"
+    CLIENT_MAC=""
+    CLIENT_HOST=""
+
+    if [ -f /tmp/dhcp.leases ]; then
+        local lease_line
+        lease_line=$(awk -v target="$ip" '$3 == target {print tolower($2), $4; exit}' /tmp/dhcp.leases)
+        if [ -n "$lease_line" ]; then
+            CLIENT_MAC=$(echo "$lease_line" | awk '{print $1}')
+            CLIENT_HOST=$(echo "$lease_line" | awk '{print $2}')
+        fi
+    fi
+
+    if [ -z "$CLIENT_MAC" ] && [ -f /proc/net/arp ]; then
+        CLIENT_MAC=$(awk -v target="$ip" '$1 == target && $3 != "0x0" {print tolower($4); exit}' /proc/net/arp)
+    fi
+
+    if [ -z "$CLIENT_MAC" ]; then
+        CLIENT_MAC=$(ip -4 neigh show "$ip" 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="lladdr") print tolower($(i+1)); exit}')
+    fi
+
+    if [ -z "$CLIENT_HOST" ] || [ "$CLIENT_HOST" = "*" ]; then
+        if [ -n "$CLIENT_MAC" ] && [ -f "$PEERS_FILE" ]; then
+            CLIENT_HOST=$(awk -F'|' -v m="$CLIENT_MAC" 'tolower($1) == m {print (NF>=5 ? $5 : $4); exit}' "$PEERS_FILE")
+        fi
+    fi
+
+    [ -z "$CLIENT_MAC" ] && CLIENT_MAC="00:00:00:00:00:00"
+    if [ -z "$CLIENT_HOST" ] || [ "$CLIENT_HOST" = "*" ]; then
+        CLIENT_HOST="LAN-Device-${ip##*.}"
+    fi
+}
+
+ensure_nft_table() {
+    if ! nft list table inet "$NFT_TABLE" >/dev/null 2>&1; then
+        /etc/init.d/allinone reload >/dev/null 2>&1
+    fi
+}
+
+get_device_state() {
+    local ip="$1"
+    local mac="$2"
+    DEV_MODE="direct"
+    DEV_ROUTING="rule"
+
+    if [ -f "$PEERS_FILE" ]; then
+        local line=""
+        if [ "$mac" != "00:00:00:00:00:00" ]; then
+            line=$(awk -F'|' -v m="$mac" 'tolower($1) == m {print $3 "|" $4; exit}' "$PEERS_FILE")
+        fi
+        if [ -z "$line" ]; then
+            line=$(awk -F'|' -v target="$ip" '$2 == target {print $3 "|" $4; exit}' "$PEERS_FILE")
+        fi
+        if [ -n "$line" ]; then
+            local m="${line%%|*}"
+            local r="${line#*|}"
+            case "$m" in direct|adg|clash|both) DEV_MODE="$m" ;; esac
+            case "$r" in rule|global) DEV_ROUTING="$r" ;; esac
+        fi
+    fi
+
+    if nft list set inet "$NFT_TABLE" mode_both_global 2>/dev/null | grep -qw "$ip"; then
+        DEV_MODE="both"
+        DEV_ROUTING="global"
+    elif nft list set inet "$NFT_TABLE" mode_both 2>/dev/null | grep -qw "$ip"; then
+        DEV_MODE="both"
+        DEV_ROUTING="rule"
+    elif nft list set inet "$NFT_TABLE" mode_clash_global 2>/dev/null | grep -qw "$ip"; then
+        DEV_MODE="clash"
+        DEV_ROUTING="global"
+    elif nft list set inet "$NFT_TABLE" mode_clash 2>/dev/null | grep -qw "$ip"; then
+        DEV_MODE="clash"
+        DEV_ROUTING="rule"
+    elif nft list set inet "$NFT_TABLE" mode_adg 2>/dev/null | grep -qw "$ip"; then
+        DEV_MODE="adg"
+    fi
+}
+
+apply_device_state() {
+    local ip="$1"
+    local mac="$2"
+    local new_mode="$3"
+    local new_routing="$4"
+    local host="$5"
+
+    ensure_nft_table
+    nft list table inet "$NFT_TABLE" >/dev/null 2>&1 || return 1
+
+    for s in mode_adg mode_clash mode_both mode_clash_global mode_both_global; do
+        nft delete element inet "$NFT_TABLE" "$s" "{ $ip }" 2>/dev/null
+    done
+
+    if [ -n "$mac" ] && [ "$mac" != "00:00:00:00:00:00" ]; then
+        for ms in mode_adg_mac mode_clash_mac mode_both_mac; do
+            nft delete element inet "$NFT_TABLE" "$ms" "{ $mac }" 2>/dev/null
+        done
+    fi
+
+    if [ -f "$PEERS_FILE" ] && [ "$mac" != "00:00:00:00:00:00" ]; then
+        local old_ip
+        old_ip=$(awk -F'|' -v m="$mac" 'tolower($1) == m {print $2; exit}' "$PEERS_FILE")
+        if [ -n "$old_ip" ] && [ "$old_ip" != "$ip" ]; then
+            for s in mode_adg mode_clash mode_both mode_clash_global mode_both_global; do
+                nft delete element inet "$NFT_TABLE" "$s" "{ $old_ip }" 2>/dev/null
+            done
+        fi
+    fi
+
+    [ "$new_routing" != "global" ] && new_routing="rule"
+    case "$new_mode" in
+        adg)
+            nft add element inet "$NFT_TABLE" mode_adg "{ $ip }" 2>/dev/null || return 1
+            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_adg_mac "{ $mac }" 2>/dev/null
+            ;;
+        clash)
+            if [ "$new_routing" = "global" ]; then
+                nft add element inet "$NFT_TABLE" mode_clash_global "{ $ip }" 2>/dev/null
+            else
+                nft add element inet "$NFT_TABLE" mode_clash "{ $ip }" 2>/dev/null
+            fi
+            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_clash_mac "{ $mac }" 2>/dev/null
+            ;;
+        both)
+            if [ "$new_routing" = "global" ]; then
+                nft add element inet "$NFT_TABLE" mode_both_global "{ $ip }" 2>/dev/null
+            else
+                nft add element inet "$NFT_TABLE" mode_both "{ $ip }" 2>/dev/null
+            fi
+            [ "$mac" != "00:00:00:00:00:00" ] && nft add element inet "$NFT_TABLE" mode_both_mac "{ $mac }" 2>/dev/null
+            ;;
+        direct|*)
+            new_mode="direct"
+            ;;
+    esac
+
+    local tmp_file="/tmp/peers.conf.$$"
+    if [ -f "$PEERS_FILE" ]; then
+        awk -F'|' -v m="$mac" -v target="$ip" '
+            BEGIN { IGNORECASE=1 }
+            !( (m != "00:00:00:00:00:00" && tolower($1) == m) || $2 == target ) { print $0 }
+        ' "$PEERS_FILE" > "$tmp_file" 2>/dev/null || : > "$tmp_file"
+    else
+        : > "$tmp_file"
+    fi
+    echo "${mac}|${ip}|${new_mode}|${new_routing}|${host}" >> "$tmp_file" 2>/dev/null || true
+    mv "$tmp_file" "$PEERS_FILE" 2>/dev/null || rm -f "$tmp_file" 2>/dev/null
+}
+
+get_core_metrics() {
+    CORE_RUNNING="false"
+    CORE_MEM_MB="0.0"
+
+    local pid
+    pid=$(pidof mihomo 2>/dev/null | awk '{print $1}')
+    if [ -n "$pid" ] && [ -d "/proc/$pid" ]; then
+        CORE_RUNNING="true"
+        local rss_kb
+        rss_kb=$(awk '/VmRSS:/ {print $2}' "/proc/$pid/status" 2>/dev/null)
+        if [ -n "$rss_kb" ] && [ "$rss_kb" -gt 0 ] 2>/dev/null; then
+            CORE_MEM_MB=$(awk -v kb="$rss_kb" 'BEGIN {printf "%.1f", kb / 1024.0}')
+        fi
+    fi
+}
+
+# 生成 Clash 规则列表 JSON 数组
+build_clash_list_json() {
+    if [ ! -f "$CLASH_LIST_FILE" ]; then
+        echo "[]"
+        return
+    fi
+    awk -F'|' '
+        BEGIN { printf "["; first=1 }
+        NF>=5 {
+            gsub(/\\/, "\\\\", $2); gsub(/"/, "\\\"", $2)
+            gsub(/\\/, "\\\\", $4); gsub(/"/, "\\\"", $4)
+            if (!first) printf ","
+            first=0
+            act = ($5 == "1") ? "true" : "false"
+            printf "{\"id\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"value\":\"%s\",\"active\":%s}", $1, $2, $3, $4, act
+        }
+        END { printf "]" }
+    ' "$CLASH_LIST_FILE"
+}
+
+# 生成 AdGuard 规则订阅列表 JSON 数组
+build_adg_list_json() {
+    if [ ! -f "$ADG_LIST_FILE" ]; then
+        echo "[]"
+        return
+    fi
+    awk -F'|' '
+        BEGIN { printf "["; first=1 }
+        NF>=6 {
+            gsub(/\\/, "\\\\", $2); gsub(/"/, "\\\"", $2)
+            gsub(/\\/, "\\\\", $5); gsub(/"/, "\\\"", $5)
+            if (!first) printf ","
+            first=0
+            en = ($6 == "1") ? "true" : "false"
+            printf "{\"id\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"format\":\"%s\",\"value\":\"%s\",\"enabled\":%s}", $1, $2, $3, $4, $5, en
+        }
+        END { printf "]" }
+    ' "$ADG_LIST_FILE"
+}
+
+api_error() {
+    printf '{"ok":false,"message":"%s"}\n' "$(json_escape "$1")"
+    exit 0
+}
+case "${REQUEST_METHOD:-GET}" in GET|POST) ;; *) api_error '请求方法不受支持' ;; esac
+if [ -n "${HTTP_ORIGIN:-}" ]; then
+    case "$HTTP_ORIGIN" in "http://${HTTP_HOST:-}"|"https://${HTTP_HOST:-}") ;; *) api_error '拒绝跨站修改请求' ;; esac
+fi
+if [ -n "$REQ_ACTION$REQ_ROUTING" ] || { [ -n "$REQ_MODE" ] && [ "$REQ_MODE" != status ]; }; then
+    [ "${REQUEST_METHOD:-GET}" = POST ] || api_error '修改操作需要 POST'
+fi
+if [ "${CONTENT_LENGTH:-0}" -gt 4194304 ]; then api_error '上传文件不能超过 3 MB'; fi
+if ! echo "$CLIENT_IP" | awk -F. 'NF!=4 {exit 1} {for(i=1;i<=4;i++) if($i !~ /^[0-9]+$/ || $i>255) exit 1}'; then
+    api_error '请使用路由器的 IPv4 地址访问控制台'
+fi
+API_LOCK=/var/lock/netpilot-api.lock
+mkdir "$API_LOCK" 2>/dev/null || api_error '正在应用其他修改，请稍后重试'
+trap 'rmdir "$API_LOCK" 2>/dev/null || true' EXIT INT TERM
+
+get_client_info "$CLIENT_IP"
+get_device_state "$CLIENT_IP" "$CLIENT_MAC"
+ACTION_MSG="状态同步成功"
+
+if [ -n "$REQ_ACTION" ]; then
+    case "$REQ_ACTION" in add_clash_url|upload_clash|select_clash|del_clash|add_adg_url|upload_adg|toggle_adg|del_adg) ;; *) api_error '未知操作' ;; esac
+    SOURCE_FAILED=0
+    cp "$CLASH_LIST_FILE" "$CLASH_LIST_FILE.bak"
+    cp "$ADG_LIST_FILE" "$ADG_LIST_FILE.bak"
+    handle_source_actions "$REQ_ACTION"
+    if [ "$SOURCE_FAILED" = 1 ]; then
+        mv "$CLASH_LIST_FILE.bak" "$CLASH_LIST_FILE"
+        mv "$ADG_LIST_FILE.bak" "$ADG_LIST_FILE"
+        api_error "$SOURCE_ERROR"
+    fi
+    rm -f "$CLASH_LIST_FILE.bak" "$ADG_LIST_FILE.bak"
+fi
+
+CHANGED=0
+if [ -n "$REQ_MODE" ] && [ "$REQ_MODE" != "status" ]; then
+    case "$REQ_MODE" in
+        direct|adg|clash|both)
+            DEV_MODE="$REQ_MODE"
+            CHANGED=1
+            case "$DEV_MODE" in
+                direct) ACTION_MSG="本机已切换至：🟢 纯净直连模式" ;;
+                adg)    ACTION_MSG="本机已切换至：🛡️ 仅去广告模式" ;;
+                clash)  ACTION_MSG="本机已切换至：🚀 仅透明代理模式" ;;
+                both)   ACTION_MSG="本机已切换至：🔥 去广告 + 透明代理模式" ;;
+            esac
+            ;;
+    esac
+fi
+
+if [ -n "$REQ_ROUTING" ]; then
+    case "$REQ_ROUTING" in
+        rule|global)
+            DEV_ROUTING="$REQ_ROUTING"
+            CHANGED=1
+            if [ "$DEV_ROUTING" = "global" ]; then
+                ACTION_MSG="本机已切换为：强制全局代理 (Global)"
+            else
+                ACTION_MSG="本机已切换为：智能规则分流 (Rule)"
+            fi
+            ;;
+    esac
+fi
+
+if [ "$CHANGED" -eq 1 ]; then
+    apply_device_state "$CLIENT_IP" "$CLIENT_MAC" "$DEV_MODE" "$DEV_ROUTING" "$CLIENT_HOST" || api_error "防火墙未就绪，未能切换设备模式"
+    chmod 600 "$PEERS_FILE"
+fi
+
+get_core_metrics
+BACKEND=$(cat "$CONF_DIR/backend" 2>/dev/null || echo unknown)
+UDP_PROXY=false
+[ "$BACKEND" != tproxy ] || UDP_PROXY=true
+ADBLOCK_COUNT=$(cat "$CONF_DIR/adblock.count" 2>/dev/null || echo 0)
+FIREWALL_READY=false
+nft list table inet "$NFT_TABLE" >/dev/null 2>&1 && FIREWALL_READY=true
+curl -fsS --max-time 2 "$MIHOMO_API/version" >/dev/null 2>&1 || CORE_RUNNING=false
+
+SAFE_HOST=$(json_escape "$CLIENT_HOST")
+SAFE_IP=$(json_escape "$CLIENT_IP")
+SAFE_MAC=$(json_escape "$CLIENT_MAC")
+SAFE_MODE=$(json_escape "$DEV_MODE")
+SAFE_ROUTING=$(json_escape "$DEV_ROUTING")
+SAFE_MSG=$(json_escape "$ACTION_MSG")
+CLASH_JSON=$(build_clash_list_json)
+ADG_JSON=$(build_adg_list_json)
+
+cat <<EOF
+{
+  "ok": true,
+  "hostname": "${SAFE_HOST}",
+  "ip": "${SAFE_IP}",
+  "mac": "${SAFE_MAC}",
+  "mode": "${SAFE_MODE}",
+  "routing": "${SAFE_ROUTING}",
+  "core_running": ${CORE_RUNNING},
+  "firewall_ready": ${FIREWALL_READY},
+  "backend": "${BACKEND}",
+  "udp_proxy": ${UDP_PROXY},
+  "adblock_rules": ${ADBLOCK_COUNT},
+  "memory_mb": "${CORE_MEM_MB}",
+  "clash_profiles": ${CLASH_JSON},
+  "adg_sources": ${ADG_JSON},
+  "ipv6_leak_guard": true,
+  "sniffer": true,
+  "message": "${SAFE_MSG}"
+}
+EOF

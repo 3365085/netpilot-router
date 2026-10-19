@@ -1,0 +1,91 @@
+# NetPilot 网络助手 — 由 netpilot-rebuild 生成运行配置
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+mode: rule
+log-level: warning
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: off
+routing-mark: 666
+
+external-controller: 127.0.0.1:9090
+secret: ""
+
+profile:
+  store-selected: true
+  store-fake-ip: false
+
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
+    - "+.apple.com"
+
+dns:
+  enable: true
+  prefer-h3: false
+  listen: 0.0.0.0:1053
+  ipv6: false
+  enhanced-mode: redir-host
+  respect-rules: true
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  direct-nameserver:
+    - https://dns.alidns.com/dns-query
+    - 223.5.5.5
+    - 119.29.29.29
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - 223.5.5.5
+  nameserver-policy:
+    "rule-set:private_domain,cn_domain":
+      - https://dns.alidns.com/dns-query
+  nameserver:
+    - https://cloudflare-dns.com/dns-query#PROXY
+    - https://dns.google/dns-query#PROXY
+
+listeners:
+  - name: in-adg
+    type: @BACKEND@
+    port: 7892
+    listen: 0.0.0.0
+    @UDP@
+
+  - name: in-clash-rule
+    type: @BACKEND@
+    port: 7893
+    listen: 0.0.0.0
+    @UDP@
+
+  - name: in-both-rule
+    type: @BACKEND@
+    port: 7894
+    listen: 0.0.0.0
+    @UDP@
+
+  - name: in-clash-global
+    type: @BACKEND@
+    port: 7896
+    listen: 0.0.0.0
+    @UDP@
+
+  - name: in-both-global
+    type: @BACKEND@
+    port: 7897
+    listen: 0.0.0.0
+    @UDP@

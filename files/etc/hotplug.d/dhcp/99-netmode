@@ -1,0 +1,7 @@
+#!/bin/sh
+[ "$ACTION" = "add" ] || [ "$ACTION" = "update" ] || exit 0
+[ -f /etc/allinone/peers.conf ] || exit 0
+
+if nft list table inet netmode >/dev/null 2>&1; then
+    /etc/init.d/allinone reload >/dev/null 2>&1 &
+fi

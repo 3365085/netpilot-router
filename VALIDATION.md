@@ -1,0 +1,48 @@
+# 验证记录
+
+验证日期：2026-10-19（UTC）。实际硬件为 gexing SP970 / Qualcomm MSM8916，ImmortalWrt SNAPSHOT，Linux 6.12.74，aarch64，Mihomo `alpha-g8f2d84f`。
+
+## 故障证据
+
+- 原安装包 nftables 配置包含重叠区间，以及 inet 表内未显式指定 `ip` 的 TPROXY 地址；路由器日志中有相应加载错误。
+- 目标内核的 `CONFIG_IP_ADVANCED_ROUTER` 未启用，`ip -4 rule show` 返回地址族不支持。仅修正 nftables 语法仍无法让原 IPv4 TPROXY 方案工作。
+- 原默认广告规则地址实测返回 404。
+- 原 `AUTO` 组包含 `DIRECT-FALLBACK`，现场实际选中的候选是直连。
+- 原 DNS 接管将普通 DNS 数据包交给 TPROXY 流量规则，不能据此按查询中的广告域名执行 DNS 阻断。动态配置还包含错误的子规则写法。
+
+## 实际流量测试
+
+在路由器上创建独立 network namespace 与临时虚拟 LAN 设备，通过网关转发真实流量；完成后删除该设备、模式记录及 namespace。测试没有使用电脑本地代理作为测试出口。
+
+| 设备模式 | 广告域名 DNS | 普通域名 DNS | 国内 HTTPS | 国外 HTTPS |
+| --- | --- | --- | --- | --- |
+| 直连 | 正常解析 | 成功 | 运营商出口 | 不作为代理测试 |
+| 仅去广告 | NXDOMAIN | 成功 | 运营商出口 | 不作为代理测试 |
+| 代理 / 规则 | 正常解析 | 成功 | 运营商出口 | 订阅节点出口 |
+| 去广告与代理 / 规则 | NXDOMAIN | 成功 | 运营商出口 | 订阅节点出口 |
+| 代理 / 全局 | 正常解析 | 成功 | 订阅节点出口 | 订阅节点出口 |
+| 去广告与代理 / 全局 | NXDOMAIN | 成功 | 订阅节点出口 | 订阅节点出口 |
+
+广告测试域名为 `ad.doubleclick.net`，普通域名为 `www.baidu.com`。出口验证使用 `https://myip.ipip.net` 与 `https://api.ipify.org`。实际运营商与代理出口不同；本仓库不记录用户的公网地址。
+
+去广告源 gcore 和 testingcf CDN 均在目标路由器返回 HTTP 200；默认使用 gcore，规范化后得到 958 条唯一域名规则。真实电脑设备的 UDP / TCP DNS 均验证广告查询返回 NXDOMAIN、普通查询成功。
+
+## 持久化与失败处理
+
+- Mihomo、两个过滤 DNS 监听器由 procd 管理，启动与监听检查通过。
+- 服务重启后，设备模式、规则数量、DNS 拦截与代理出口验证通过。
+- firewall reload 后，设备集合、DNS 拦截与代理出口验证通过。
+- 未认证的控制台和 API 请求返回 HTTP 401，使用路由器认证后访问成功。
+- GET 修改和跨站 Origin 修改被拒绝。
+- 导入不可下载的新广告规则返回失败；规则源列表恢复，原配置继续工作。
+- 原 Clash 订阅登记文件与修改前备份逐字节一致。
+- 空订阅的新安装配置通过 Mihomo 校验，代理模式使用明确的拒绝占位节点，不把直连伪装成代理。
+- TCP 兼容模式的外网 UDP 阻断规则已通过实际 UDP 测试及 nftables 计数器验证。
+- 实际电脑已运行本地 FlClash，双重接管导致 GitHub 连接失败。将电脑的路由器模式设为“仅去广告”后 GitHub 访问恢复；手机保持“去广告与全局代理”。完整路由器代理测试由独立 namespace 完成。
+- 域名转换回归测试、Shell / 页面 JavaScript 语法和 LuCI 菜单 JSON 检查通过。
+
+## 验证边界
+
+目标固件缺少 IPv4 策略路由，因此以上实际数据测试使用 **TCP REDIRECT 兼容模式**。TPROXY 分支的配置和 nftables 语法单独预检；完整 UDP 代理未在目标硬件验证。要使用透明 UDP 代理，需要具有相应内核配置的固件。
+
+没有进行整机重启测试；开机自启链接已核实，已测试服务重启与 firewall reload。DNS 去广告不能替代浏览器美容过滤，也不能保证拦截加密 DNS 或与正文共用域名的广告。

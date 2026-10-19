@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+. /usr/lib/netpilot/config.sh
+LOCK=/var/lock/netpilot-config.lock
+mkdir "$LOCK" 2>/dev/null || { echo '正在应用其他配置，请稍后再试' >&2; exit 1; }
+trap 'rmdir "$LOCK" 2>/dev/null || true' EXIT INT TERM
+netpilot_compile || exit 1
+if [ "${1:-}" = --apply ]; then
+    NETPILOT_SKIP_COMPILE=1 /etc/init.d/allinone restart
+fi

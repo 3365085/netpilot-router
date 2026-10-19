@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NetPilot · 网络助手</title>
+  <style>
+    :root {
+      --bg-primary: #f5f5f7;
+      --bg-card: rgba(255, 255, 255, 0.88);
+      --bg-subtle: rgba(118, 118, 128, 0.09);
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-muted: #86868b;
+      --border-hairline: rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
+      --shadow-active: 0 12px 32px rgba(0, 113, 227, 0.16);
+      --accent-blue: #0071e3;
+      --accent-green: #28cd41;
+      --accent-teal: #007aff;
+      --accent-indigo: #5856d6;
+      --accent-orange: #ff6b00;
+      --accent-red: #ff3b30;
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #000000;
+        --bg-card: rgba(28, 28, 30, 0.9);
+        --bg-subtle: rgba(118, 118, 128, 0.22);
+        --text-primary: #f5f5f7;
+        --text-secondary: #a1a1a6;
+        --text-muted: #6e6e73;
+        --border-hairline: rgba(255, 255, 255, 0.12);
+        --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.45);
+        --shadow-active: 0 12px 34px rgba(10, 132, 255, 0.25);
+        --accent-blue: #0a84ff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px 16px 48px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 4px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0071e3, #5856d6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.28);
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .core-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(40, 205, 65, 0.2);
+    }
+
+    .status-dot.offline {
+      background: var(--accent-red);
+      box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.2);
+    }
+
+    .hero-card {
+      background: var(--bg-card);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .device-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .device-identity {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .device-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .device-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      word-break: break-all;
+    }
+
+    .current-mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 13px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    @media (max-width: 500px) {
+      .meta-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .meta-item.full-mobile {
+        grid-column: span 2;
+      }
+    }
+
+    .meta-item {
+      background: var(--bg-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-key {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      word-break: break-all;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 4px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .section-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 540px) {
+      .modes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mode-card {
+      position: relative;
+      background: var(--bg-card);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1.5px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      user-select: none;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .mode-card:active {
+      transform: scale(0.985);
+    }
+
+    .mode-card.active {
+      border-color: var(--accent-blue);
+      box-shadow: var(--shadow-active);
+    }
+
+    .mode-card[data-mode="direct"].active {
+      border-color: var(--accent-green);
+      box-shadow: 0 12px 30px rgba(40, 205, 65, 0.15);
+    }
+
+    .mode-card[data-mode="adg"].active {
+      border-color: var(--accent-teal);
+      box-shadow: 0 12px 30px rgba(0, 122, 255, 0.16);
+    }
+
+    .mode-card[data-mode="clash"].active {
+      border-color: var(--accent-indigo);
+      box-shadow: 0 12px 30px rgba(88, 86, 214, 0.18);
+    }
+
+    .mode-card[data-mode="both"].active {
+      border-color: var(--accent-orange);
+      box-shadow: 0 12px 30px rgba(255, 107, 0, 0.18);
+    }
+
+    .mode-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mode-icon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mode-emoji {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .mode-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .mode-code {
+      font-size: 11px;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .mode-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: transparent;
+      flex-shrink: 0;
+    }
+
+    .mode-card.active .mode-check {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .mode-card[data-mode="direct"].active .mode-check {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    .mode-card[data-mode="adg"].active .mode-check {
+      background: var(--accent-teal);
+      border-color: var(--accent-teal);
+    }
+
+    .mode-card[data-mode="clash"].active .mode-check {
+      background: var(--accent-indigo);
+      border-color: var(--accent-indigo);
+    }
+
+    .mode-card[data-mode="both"].active .mode-check {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    .mode-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .mode-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+    }
+
+    .routing-card {
+      background: var(--bg-card);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .routing-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .routing-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .routing-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: var(--bg-subtle);
+      padding: 3px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 多规则管理面板 */
+    .import-panel {
+      background: var(--bg-card);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xl);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .import-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .import-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .import-block {
+      background: var(--bg-subtle);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .import-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .import-block-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .badge-hint {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+    }
+
+    .source-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .source-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .source-item.active-item {
+      border-color: var(--accent-blue);
+    }
+
+    .source-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .source-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .source-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .source-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+    }
+
+    .source-tag.on {
+      background: rgba(40, 205, 65, 0.16);
+      color: #1d9bf0;
+    }
+
+    .source-url {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: "SF Mono", Menlo, monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .mini-btn.primary {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    .mini-btn.danger {
+      color: var(--accent-red);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .name-input {
+      width: 130px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .url-input {
+      flex: 1;
+      min-width: 170px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .action-btn {
+      border: none;
+      background: var(--accent-blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .action-btn.secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-hairline);
+    }
+
+    .file-input-hidden {
+      display: none;
+    }
+
+    .security-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-subtle);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .sec-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .refresh-btn {
+      border: none;
+      background: transparent;
+      color: var(--accent-blue);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(29, 29, 31, 0.94);
+      color: #fff;
+      padding: 11px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">N</div>
+        <div>
+          <div class="brand-title">NetPilot 网络助手</div>
+          <div class="brand-sub">设备独立控制 · DNS 去广告 · 透明代理</div>
+        </div>
+      </div>
+      <div class="core-pill">
+        <span class="status-dot" id="coreDot"></span>
+        <span id="coreText">Mihomo 检测中...</span>
+      </div>
+    </header>
+
+    <section class="hero-card">
+      <div class="device-header">
+        <div class="device-identity">
+          <span class="device-label">当前访问终端（自动识别 · 独立配置）</span>
+          <h1 class="device-name" id="devHostname">正在识别设备...</h1>
+        </div>
+        <div class="current-mode-badge" id="currentModeBadge">
+          <span>🟢 纯净直连</span>
+        </div>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-key">本机 IPv4 地址</span>
+          <span class="meta-val" id="devIp">--.--.--.--</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-key">本机 MAC 地址</span>
+          <span class="meta-val" id="devMac">--:--:--:--:--:--</span>
+        </div>
+        <div class="meta-item full-mobile">
+          <span class="meta-key">Mihomo 实际内存 (RSS)</span>
+          <span class="meta-val" id="devMem">-- MB</span>
+        </div>
+      </div>
+    </section>
+
+    <p id="backendInfo" style="color:var(--text-secondary);line-height:1.7;margin:16px 4px"></p>
+    <div class="section-header">
+      <span class="section-title">选择本机的网络模式</span>
+      <span class="section-hint">按设备独立分流 · 不影响局域网其他终端</span>
+    </div>
+
+    <section class="modes-grid">
+      <button type="button" class="mode-card" data-mode="direct" onclick="switchMode('direct')">
+        <div>
+          <div class="mode-top">
+            <div class="mode-icon-wrap">
+              <span class="mode-emoji">🟢</span>
+              <div>
+                <div class="mode-title">纯净直连</div>
+                <span class="mode-code">direct</span>
+              </div>
+            </div>
+            <div class="mode-check">✓</div>
+          </div>
+          <p class="mode-desc" style="margin-top: 10px;">
+            默认原生状态。DNS 走路由器默认 dnsmasq，所有流量直接 NAT 出网，完全不经过 Mihomo 内核。
+          </p>
+        </div>
+        <div class="mode-tags">
+          <span class="tag">0 代理延迟</span>
+          <span class="tag">运营商原生 DNS</span>
+          <span class="tag">网银/国服首选</span>
+        </div>
+      </button>
+
+      <button type="button" class="mode-card" data-mode="adg" onclick="switchMode('adg')">
+        <div>
+          <div class="mode-top">
+            <div class="mode-icon-wrap">
+              <span class="mode-emoji">🛡️</span>
+              <div>
+                <div class="mode-title">仅去广告</div>
+                <span class="mode-code">@mode_adg</span>
+              </div>
+            </div>
+            <div class="mode-check">✓</div>
+          </div>
+          <p class="mode-desc" style="margin-top: 10px;">
+            仅将 53 端口 DNS 导向去广告入口并返回真实 IP，数据流量 100% 保持原生直连。
+          </p>
+        </div>
+        <div class="mode-tags">
+          <span class="tag">多规则叠加去广告</span>
+          <span class="tag">真实 IP 不断网</span>
+          <span class="tag">流量 100% 直连</span>
+        </div>
+      </button>
+
+      <button type="button" class="mode-card" data-mode="clash" onclick="switchMode('clash')">
+        <div>
+          <div class="mode-top">
+            <div class="mode-icon-wrap">
+              <span class="mode-emoji">🚀</span>
+              <div>
+                <div class="mode-title">仅透明代理</div>
+                <span class="mode-code">@mode_clash</span>
+              </div>
+            </div>
+            <div class="mode-check">✓</div>
+          </div>
+          <p class="mode-desc" style="margin-top: 10px;">
+            严格跳过广告拦截规则，仅执行国内外代理分流（或本机强制全局），避免误杀特殊站点。
+          </p>
+        </div>
+        <div class="mode-tags">
+          <span class="tag">透明代理</span>
+          <span class="tag">跳过广告拦截</span>
+          <span class="tag">防 IPv6 泄漏</span>
+        </div>
+      </button>
+
+      <button type="button" class="mode-card" data-mode="both" onclick="switchMode('both')">
+        <div>
+          <div class="mode-top">
+            <div class="mode-icon-wrap">
+              <span class="mode-emoji">🔥</span>
+              <div>
+                <div class="mode-title">去广告 + 透明代理</div>
+                <span class="mode-code">@mode_both</span>
+              </div>
+            </div>
+            <div class="mode-check">✓</div>
+          </div>
+          <p class="mode-desc" style="margin-top: 10px;">
+            通过 DNS 拦截广告域名，网页流量再按国内外规则分流；可切换为全局代理。
+          </p>
+        </div>
+        <div class="mode-tags">
+          <span class="tag">强力去广告</span>
+          <span class="tag">自动适配固件</span>
+          <span class="tag">SNI 域名嗅探</span>
+        </div>
+      </button>
+    </section>
+
+    <section class="routing-card">
+      <div class="routing-info">
+        <div class="routing-title">🧭 本机代理分流策略（仅对当前设备生效）</div>
+        <div class="routing-sub">
+          在代理模式（🚀 仅透明代理 / 🔥 去广告与代理）下，单独控制本机走“国内外规则分流”还是“强制全局代理”。
+        </div>
+      </div>
+      <div class="segmented-control">
+        <button type="button" class="seg-btn active" id="btnRule" onclick="switchRouting('rule')">
+          规则分流 (Rule)
+        </button>
+        <button type="button" class="seg-btn" id="btnGlobal" onclick="switchRouting('global')">
+          强制全局 (Global)
+        </button>
+      </div>
+    </section>
+
+    <!-- 多订阅 & 多规则管理中心 -->
+    <section class="import-panel">
+      <div>
+        <div class="import-title">📦 Clash 多配置单选切换 &amp; DNS 去广告 多规则叠加中心</div>
+        <div class="import-sub">Clash 订阅单选生效；去广告使用域名 YAML / 文本规则，DNS 与流量拦截同步更新（不支持浏览器美容规则和 MRS）</div>
+      </div>
+
+      <!-- 1. Clash 多配置管理（单选生效） -->
+      <div class="import-block">
+        <div class="import-block-head">
+          <span class="import-block-name">🚀 Clash 节点配置列表</span>
+          <span class="badge-hint">可存多个 · 每次单选生效 1 个</span>
+        </div>
+
+        <div class="source-list" id="clashListContainer"></div>
+
+        <div class="input-row">
+          <input type="text" class="name-input" id="clashNameInput" placeholder="备注名称 (选填)" />
+          <input type="url" class="url-input" id="clashUrlInput" placeholder="粘贴新增 Clash 订阅链接 (https://...)" />
+          <button type="button" class="action-btn" onclick="addClashUrl()">+ 添加链接</button>
+          <button type="button" class="action-btn secondary" onclick="document.getElementById('clashFileInput').click()">
+            📁 上传 YAML
+          </button>
+          <input type="file" id="clashFileInput" class="file-input-hidden" accept=".yaml,.yml,.txt" onchange="uploadFile('clash', this)" />
+        </div>
+      </div>
+
+      <!-- 2. DNS 去广告 多规则订阅管理（多选叠加生效） -->
+      <div class="import-block">
+        <div class="import-block-head">
+          <span class="import-block-name">🛡️ DNS 去广告规则订阅列表</span>
+          <span class="badge-hint">支持多个规则同时启用 · 自动叠加拦截</span>
+        </div>
+
+        <div class="source-list" id="adgListContainer"></div>
+
+        <div class="input-row">
+          <input type="text" class="name-input" id="adgNameInput" placeholder="规则名称 (选填)" />
+          <input type="url" class="url-input" id="adgUrlInput" placeholder="粘贴新增去广告规则链接 (.yaml / .txt)" />
+          <button type="button" class="action-btn" onclick="addAdgUrl()">+ 添加订阅</button>
+          <button type="button" class="action-btn secondary" onclick="document.getElementById('adgFileInput').click()">
+            📁 上传规则
+          </button>
+          <input type="file" id="adgFileInput" class="file-input-hidden" accept=".yaml,.yml,.txt,.conf,.list" onchange="uploadFile('adg', this)" />
+        </div>
+      </div>
+    </section>
+
+    <footer class="security-bar">
+      <div class="sec-items">
+        <span>🔒 IPv6 防泄漏：<strong>已启用</strong></span>
+        <span>🔍 TLS SNI 嗅探：<strong>已启用</strong></span>
+        <span>💾 设备独立记忆：<strong>/etc/allinone/peers.conf</strong></span>
+      </div>
+      <button type="button" class="refresh-btn" onclick="fetchStatus(true)">↻ 刷新状态</button>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已切换模式</div>
+
+  <script>
+    const MODE_LABELS = {
+      direct: "🟢 纯净直连 (direct)",
+      adg: "🛡️ 仅去广告 (adg)",
+      clash: "🚀 仅透明代理 (clash)",
+      both: "🔥 去广告+代理 (both)"
+    };
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.remove("show");
+      }, 2600);
+    }
+
+    function toBase64Bytes(uint8) {
+      let binary = "";
+      const chunk = 0x8000;
+      for (let i = 0; i < uint8.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, uint8.subarray(i, i + chunk));
+      }
+      return btoa(binary);
+    }
+
+    function toBase64Utf8(str) {
+      const bytes = new TextEncoder().encode(str);
+      return toBase64Bytes(bytes);
+    }
+
+    function toUrlSafeBase64(str) {
+      if (!str) return "";
+      return toBase64Utf8(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function renderClashList(list) {
+      const box = document.getElementById("clashListContainer");
+      box.innerHTML = "";
+      (list || []).forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "source-item" + (item.active ? " active-item" : "");
+
+        const main = document.createElement("div");
+        main.className = "source-main";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "source-title-row";
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "source-name";
+        nameEl.textContent = item.name || item.id;
+
+        const typeTag = document.createElement("span");
+        typeTag.className = "source-tag";
+        typeTag.textContent = item.type === "file" ? "本地文件" : "在线订阅";
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "source-tag" + (item.active ? " on" : "");
+        statusTag.textContent = item.active ? "● 当前生效" : "未激活";
+
+        titleRow.appendChild(nameEl);
+        titleRow.appendChild(typeTag);
+        titleRow.appendChild(statusTag);
+
+        const urlEl = document.createElement("div");
+        urlEl.className = "source-url";
+        urlEl.textContent = item.value;
+
+        main.appendChild(titleRow);
+        main.appendChild(urlEl);
+
+        const actions = document.createElement("div");
+        actions.className = "source-actions";
+
+        if (!item.active) {
+          const useBtn = document.createElement("button");
+          useBtn.type = "button";
+          useBtn.className = "mini-btn primary";
+          useBtn.textContent = "设为生效";
+          useBtn.onclick = () => selectClash(item.id);
+          actions.appendChild(useBtn);
+        }
+
+        if ((list || []).length > 1) {
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "mini-btn danger";
+          delBtn.textContent = "删除";
+          delBtn.onclick = () => deleteClash(item.id);
+          actions.appendChild(delBtn);
+        }
+
+        row.appendChild(main);
+        row.appendChild(actions);
+        box.appendChild(row);
+      });
+    }
+
+    function renderAdgList(list) {
+      const box = document.getElementById("adgListContainer");
+      box.innerHTML = "";
+      (list || []).forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "source-item" + (item.enabled ? " active-item" : "");
+
+        const main = document.createElement("div");
+        main.className = "source-main";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "source-title-row";
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "source-name";
+        nameEl.textContent = item.name || item.id;
+
+        const fmtTag = document.createElement("span");
+        fmtTag.className = "source-tag";
+        fmtTag.textContent = (item.type === "file" ? "本地 · " : "订阅 · ") + (item.format || "text");
+
+        const statusTag = document.createElement("span");
+        statusTag.className = "source-tag" + (item.enabled ? " on" : "");
+        statusTag.textContent = item.enabled ? "✓ 已启用" : "已停用";
+
+        titleRow.appendChild(nameEl);
+        titleRow.appendChild(fmtTag);
+        titleRow.appendChild(statusTag);
+
+        const urlEl = document.createElement("div");
+        urlEl.className = "source-url";
+        urlEl.textContent = item.value;
+
+        main.appendChild(titleRow);
+        main.appendChild(urlEl);
+
+        const actions = document.createElement("div");
+        actions.className = "source-actions";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "mini-btn" + (item.enabled ? "" : " primary");
+        toggleBtn.textContent = item.enabled ? "停用" : "启用";
+        toggleBtn.onclick = () => toggleAdg(item.id);
+        actions.appendChild(toggleBtn);
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "mini-btn danger";
+        delBtn.textContent = "删除";
+        delBtn.onclick = () => deleteAdg(item.id);
+        actions.appendChild(delBtn);
+
+        row.appendChild(main);
+        row.appendChild(actions);
+        box.appendChild(row);
+      });
+    }
+
+    function renderState(data) {
+      if (!data) return;
+      document.getElementById("devHostname").textContent = data.hostname || "局域网终端";
+      document.getElementById("devIp").textContent = data.ip || "--";
+      document.getElementById("devMac").textContent = (data.mac || "--").toUpperCase();
+
+      document.getElementById("devMem").textContent = data.core_running
+        ? (data.memory_mb + " MB")
+        : "核心未运行";
+
+      const dot = document.getElementById("coreDot");
+      const coreText = document.getElementById("coreText");
+      if (data.core_running) {
+        dot.classList.remove("offline");
+        coreText.textContent = "Mihomo 运行中 (" + data.memory_mb + " MB)";
+      } else {
+        dot.classList.add("offline");
+        coreText.textContent = "Mihomo 未启动";
+      }
+
+      document.getElementById("backendInfo").textContent =
+        (data.backend === "tproxy" ? "完整接管：TCP / UDP" : "TCP 兼容模式：当前固件缺少 IPv4 策略路由；代理设备的外网 UDP 已阻断，QUIC 会回退到 TCP。") +
+        " · 已加载 " + (data.adblock_rules || 0) + " 条广告域名规则" +
+        (data.firewall_ready ? " · 防火墙已就绪" : " · 防火墙未就绪");
+      const activeMode = data.mode || "direct";
+      document.getElementById("currentModeBadge").textContent =
+        MODE_LABELS[activeMode] || MODE_LABELS.direct;
+
+      document.querySelectorAll(".mode-card").forEach((card) => {
+        card.classList.toggle("active", card.getAttribute("data-mode") === activeMode);
+      });
+
+      const routing = data.routing === "global" ? "global" : "rule";
+      document.getElementById("btnRule").classList.toggle("active", routing === "rule");
+      document.getElementById("btnGlobal").classList.toggle("active", routing === "global");
+
+      renderClashList(data.clash_profiles || []);
+      renderAdgList(data.adg_sources || []);
+    }
+
+    async function callApi(query, showNotice, postBody) {
+      try {
+        const opts = {
+          method: query === "mode=status" ? "GET" : "POST",
+          cache: "no-store"
+        };
+        if (postBody) opts.body = postBody;
+        const res = await fetch("/cgi-bin/netpilot?" + query + "&_t=" + Date.now(), opts);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || "操作失败");
+        renderState(data);
+        if (showNotice && data.message) showToast(data.message);
+      } catch (err) {
+        showToast("操作失败：" + err.message);
+      }
+    }
+
+    function fetchStatus(manual) {
+      callApi("mode=status", !!manual);
+    }
+
+    function switchMode(mode) {
+      callApi("mode=" + encodeURIComponent(mode), true);
+    }
+
+    function switchRouting(routing) {
+      callApi("routing=" + encodeURIComponent(routing), true);
+    }
+
+    function addClashUrl() {
+      const url = document.getElementById("clashUrlInput").value.trim();
+      const name = document.getElementById("clashNameInput").value.trim();
+      if (!url) {
+        showToast("请先输入 Clash 订阅链接");
+        return;
+      }
+      callApi(
+        "action=add_clash_url&name_b64=" + encodeURIComponent(toUrlSafeBase64(name)),
+        true,
+        toBase64Utf8(url)
+      );
+      document.getElementById("clashUrlInput").value = "";
+      document.getElementById("clashNameInput").value = "";
+    }
+
+    function selectClash(id) {
+      callApi("action=select_clash&id=" + encodeURIComponent(id), true);
+    }
+
+    function deleteClash(id) {
+      callApi("action=del_clash&id=" + encodeURIComponent(id), true);
+    }
+
+    function addAdgUrl() {
+      const url = document.getElementById("adgUrlInput").value.trim();
+      const name = document.getElementById("adgNameInput").value.trim();
+      if (!url) {
+        showToast("请先输入 DNS 去广告 规则订阅链接");
+        return;
+      }
+      callApi(
+        "action=add_adg_url&name_b64=" + encodeURIComponent(toUrlSafeBase64(name)),
+        true,
+        toBase64Utf8(url)
+      );
+      document.getElementById("adgUrlInput").value = "";
+      document.getElementById("adgNameInput").value = "";
+    }
+
+    function toggleAdg(id) {
+      callApi("action=toggle_adg&id=" + encodeURIComponent(id), true);
+    }
+
+    function deleteAdg(id) {
+      callApi("action=del_adg&id=" + encodeURIComponent(id), true);
+    }
+
+    function uploadFile(target, inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const nameInput = document.getElementById(target === "clash" ? "clashNameInput" : "adgNameInput");
+      const customName = (nameInput && nameInput.value.trim()) || file.name;
+      showToast("正在上传 " + file.name + " ...");
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const uint8 = new Uint8Array(e.target.result);
+        const b64 = toBase64Bytes(uint8);
+        const action = target === "clash" ? "upload_clash" : "upload_adg";
+        callApi(
+          "action=" + action +
+          "&filename=" + encodeURIComponent(file.name) +
+          "&name_b64=" + encodeURIComponent(toUrlSafeBase64(customName)),
+          true,
+          b64
+        );
+        inputEl.value = "";
+        if (nameInput) nameInput.value = "";
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchStatus(false);
+    });
+  </script>
+</body>
+</html>

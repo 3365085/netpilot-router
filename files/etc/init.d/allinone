@@ -1,0 +1,201 @@
+#!/bin/sh /etc/rc.common
+# NetPilot 网络助手. Legacy service name keeps upgrades and device records intact.
+START=99
+STOP=15
+USE_PROCD=1
+CONF_DIR=/etc/allinone
+NFT_TABLE=netmode
+PEERS_FILE="$CONF_DIR/peers.conf"
+
+mac_to_ip() {
+    local target="$1" found
+    found=$(awk -v m="$target" 'tolower($2)==m {print $3; exit}' /tmp/dhcp.leases 2>/dev/null)
+    [ -n "$found" ] || found=$(ip -4 neigh show | awk -v m="$target" 'tolower($5)==m {print $1; exit}')
+    [ -z "$found" ] || echo "$found"
+}
+
+restore_peers() {
+    [ -f "$PEERS_FILE" ] || return 0
+    local mac ip mode routing host set tmp="$CONF_DIR/.peers.$$" current
+    for set in mode_adg mode_clash mode_both mode_clash_global mode_both_global mode_adg_mac mode_clash_mac mode_both_mac; do
+        nft flush set inet "$NFT_TABLE" "$set" || return 1
+    done
+    : > "$tmp"
+    while IFS='|' read -r mac ip mode routing host; do
+        [ -n "$mac" ] || continue
+        mac=$(echo "$mac" | tr 'A-F' 'a-f')
+        case "$routing" in rule|global) ;; *) host="$routing"; routing=rule ;; esac
+        case "$mode" in direct|adg|clash|both) ;; *) continue ;; esac
+        current=$(mac_to_ip "$mac"); [ -z "$current" ] || ip="$current"
+        echo "$mac|$ip|$mode|$routing|$host" >> "$tmp"
+        [ "$mode" != direct ] || continue
+        set="mode_$mode"
+        [ "$mode" = adg ] || [ "$routing" != global ] || set="${set}_global"
+        nft add element inet "$NFT_TABLE" "$set" "{ $ip }" || { rm -f "$tmp"; return 1; }
+        if [ "$mac" != 00:00:00:00:00:00 ]; then
+            nft add element inet "$NFT_TABLE" "mode_${mode}_mac" "{ $mac }" || { rm -f "$tmp"; return 1; }
+        fi
+    done < "$PEERS_FILE"
+    mv "$tmp" "$PEERS_FILE"
+    chmod 600 "$PEERS_FILE"
+}
+
+setup_nftables() {
+    local backend rulefile=/var/run/netpilot.nft mode port
+    backend=$(cat "$CONF_DIR/backend")
+    : > "$rulefile"
+    if nft list table inet "$NFT_TABLE" >/dev/null 2>&1; then echo "delete table inet $NFT_TABLE" >> "$rulefile"; fi
+    cat >> "$rulefile" <<'EOF'
+table inet netmode {
+  set mode_adg { type ipv4_addr; flags interval; }
+  set mode_clash { type ipv4_addr; flags interval; }
+  set mode_both { type ipv4_addr; flags interval; }
+  set mode_clash_global { type ipv4_addr; flags interval; }
+  set mode_both_global { type ipv4_addr; flags interval; }
+  set mode_adg_mac { type ether_addr; }
+  set mode_clash_mac { type ether_addr; }
+  set mode_both_mac { type ether_addr; }
+  set reserved_ip {
+    type ipv4_addr; flags interval;
+    elements = { 0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8,
+                 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16, 224.0.0.0/3 }
+  }
+  chain dns {
+    type nat hook prerouting priority -105; policy accept;
+    ip saddr @mode_adg meta l4proto { tcp, udp } th dport 53 counter redirect to :1054
+    ip saddr @mode_both meta l4proto { tcp, udp } th dport 53 counter redirect to :1055
+    ip saddr @mode_both_global meta l4proto { tcp, udp } th dport 53 counter redirect to :1055
+    ip saddr @mode_clash meta l4proto { tcp, udp } th dport 53 counter redirect to :1053
+    ip saddr @mode_clash_global meta l4proto { tcp, udp } th dport 53 counter redirect to :1053
+  }
+  chain input {
+    type filter hook input priority -5; policy accept;
+    meta nfproto ipv6 ether saddr @mode_adg_mac meta l4proto { tcp, udp } th dport 53 reject
+    meta nfproto ipv6 ether saddr @mode_clash_mac meta l4proto { tcp, udp } th dport 53 reject
+    meta nfproto ipv6 ether saddr @mode_both_mac meta l4proto { tcp, udp } th dport 53 reject
+  }
+  chain forward {
+    type filter hook forward priority -10; policy accept;
+    meta nfproto ipv6 ether saddr @mode_adg_mac meta l4proto { tcp, udp } th dport 53 reject
+    meta nfproto ipv6 ip6 daddr != { ::1/128, fe80::/10, fc00::/7, ff00::/8 } ether saddr @mode_clash_mac reject with icmpx type admin-prohibited
+    meta nfproto ipv6 ip6 daddr != { ::1/128, fe80::/10, fc00::/7, ff00::/8 } ether saddr @mode_both_mac reject with icmpx type admin-prohibited
+EOF
+    if [ "$backend" = redirect ]; then
+        cat >> "$rulefile" <<'EOF'
+    ip daddr @reserved_ip return
+    ip saddr @mode_clash meta l4proto udp counter reject
+    ip saddr @mode_clash_global meta l4proto udp counter reject
+    ip saddr @mode_both meta l4proto udp counter reject
+    ip saddr @mode_both_global meta l4proto udp counter reject
+EOF
+    fi
+    echo '  }' >> "$rulefile"
+    if [ "$backend" = tproxy ]; then
+        cat >> "$rulefile" <<'EOF'
+  chain capture {
+    type filter hook prerouting priority mangle; policy accept;
+    meta mark 666 return
+    meta l4proto { tcp, udp } th dport 53 return
+    ip daddr @reserved_ip return
+EOF
+    else
+        cat >> "$rulefile" <<'EOF'
+  chain capture {
+    type nat hook prerouting priority -104; policy accept;
+    ip daddr @reserved_ip return
+EOF
+    fi
+    for mode in clash both clash_global both_global; do
+        case "$mode" in clash) port=7893 ;; both) port=7894 ;; clash_global) port=7896 ;; both_global) port=7897 ;; esac
+        if [ "$backend" = tproxy ]; then
+            echo "    ip saddr @mode_$mode meta l4proto { tcp, udp } counter tproxy ip to 127.0.0.1:$port meta mark set 0x1 accept" >> "$rulefile"
+        else
+            echo "    ip saddr @mode_$mode meta l4proto tcp counter redirect to :$port" >> "$rulefile"
+        fi
+    done
+    printf '  }\n}\n' >> "$rulefile"
+    # Validate and replace the whole table in one nft transaction.
+    nft -c -f "$rulefile" || return 1
+    [ "${NETPILOT_DRY_RUN:-0}" != 1 ] || return 0
+    nft -f "$rulefile" || return 1
+    if [ "$backend" = tproxy ]; then
+        ip -4 rule del priority 100 fwmark 0x1 table 100 2>/dev/null
+        ip -4 route replace local 0.0.0.0/0 dev lo table 100 || return 1
+        ip -4 rule add fwmark 0x1 table 100 priority 100 || return 1
+    fi
+    restore_peers
+}
+
+start_service() {
+    [ -x /usr/bin/mihomo ] || { logger -t netpilot 'Missing Mihomo executable'; return 1; }
+    if [ "${NETPILOT_SKIP_COMPILE:-0}" != 1 ]; then
+        /usr/sbin/netpilot-rebuild || return 1
+    fi
+    [ -f "$PEERS_FILE" ] || touch "$PEERS_FILE"
+    local backend mode port upstream dnsconf
+    backend=$(cat "$CONF_DIR/backend")
+    procd_open_instance mihomo
+    procd_set_param command /usr/bin/mihomo -d "$CONF_DIR" -f "$CONF_DIR/config.yaml"
+    procd_set_param env GOGC=30 GOMEMLIMIT=64MiB SAFE_PATHS="$CONF_DIR"
+    procd_set_param respawn 3600 5 5
+    procd_set_param limits core=0 nofile='65535 65535'
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_close_instance
+    for mode in adg both; do
+        if [ "$mode" = adg ]; then port=1054; upstream='server=223.5.5.5
+server=119.29.29.29'; else port=1055; upstream='server=127.0.0.1#1053'; fi
+        dnsconf="/var/run/netpilot-dns-$mode.conf"
+        cat > "$dnsconf" <<EOF
+port=$port
+bind-interfaces
+listen-address=0.0.0.0
+no-resolv
+no-hosts
+cache-size=512
+filter-AAAA
+conf-file=$CONF_DIR/adblock.dnsmasq
+$upstream
+EOF
+        procd_open_instance "dns-$mode"
+        procd_set_param command /usr/sbin/dnsmasq --keep-in-foreground --conf-file="$dnsconf" --pid-file="/var/run/netpilot-dns-$mode.pid"
+        procd_set_param respawn 3600 5 5
+        procd_set_param stdout 1
+        procd_set_param stderr 1
+        procd_close_instance
+    done
+    logger -t netpilot "Starting NetPilot ($backend); firewall attaches after listener health check"
+}
+
+service_started() {
+    local retries=0
+    while [ "$retries" -lt 20 ]; do
+        if curl -fsS --max-time 1 http://127.0.0.1:9090/version >/dev/null 2>&1 &&
+           netstat -lnu 2>/dev/null | grep -q ':1054 ' &&
+           netstat -lnu 2>/dev/null | grep -q ':1055 '; then
+            if setup_nftables; then logger -t netpilot 'Listeners healthy; per-device firewall attached'; return 0; fi
+            break
+        fi
+        retries=$((retries + 1)); sleep 1
+    done
+    nft delete table inet "$NFT_TABLE" 2>/dev/null
+    logger -t netpilot 'ERROR: startup validation failed; capture disabled'
+    return 1
+}
+
+stop_service() {
+    nft delete table inet "$NFT_TABLE" 2>/dev/null
+    if ip -4 rule show >/dev/null 2>&1; then
+        ip -4 rule del priority 100 fwmark 0x1 table 100 2>/dev/null
+        ip -4 route flush table 100 2>/dev/null
+    fi
+}
+
+reload_service() {
+    curl -fsS --max-time 2 http://127.0.0.1:9090/version >/dev/null 2>&1 || return 1
+    setup_nftables
+}
+
+service_triggers() {
+    procd_add_reload_trigger network firewall dhcp
+}
