@@ -3,16 +3,17 @@
 set -eu
 cd "$(dirname "$0")"
 [ "$(id -u)" = 0 ] || { echo '请以 root 安装'; exit 1; }
-for cmd in curl nft ip dnsmasq jsonfilter uci; do
+for cmd in curl nft ip dnsmasq jsonfilter uci ucode; do
     command -v "$cmd" >/dev/null || { echo "缺少依赖：$cmd"; exit 1; }
 done
+ucode -e 'import { readfile } from "fs";' >/dev/null 2>&1 || { echo '缺少依赖：ucode-mod-fs'; exit 1; }
 [ -x /usr/bin/mihomo ] || { echo '请先安装官方 Mihomo 核心到 /usr/bin/mihomo，然后重新运行安装。'; exit 1; }
 /usr/bin/mihomo -v >/dev/null || exit 1
 stamp=$(date +%Y%m%d-%H%M%S)
 backup="/root/netpilot-backup-$stamp"
 mkdir -p "$backup"
 chmod 700 "$backup"
-for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.html /etc/config/firewall /etc/config/uhttpd /etc/httpd.conf; do
+for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.html /www/netpilot.html /usr/lib/netpilot /usr/share/netpilot /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes /etc/config/firewall /etc/config/uhttpd /etc/httpd.conf; do
     if [ -e "$path" ]; then
         mkdir -p "$backup$(dirname "$path")"
         cp -a "$path" "$backup$path"
@@ -20,7 +21,7 @@ for path in /etc/allinone /etc/init.d/allinone /www/cgi-bin/netmode /www/net.htm
 done
 if [ -x /etc/init.d/allinone ]; then /etc/init.d/allinone stop || true; fi
 cp -R files/. /
-chmod 755 /etc/init.d/allinone /etc/hotplug.d/dhcp/99-netmode /www/cgi-bin/netmode /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall
+chmod 755 /etc/init.d/allinone /etc/hotplug.d/dhcp/99-netmode /www/cgi-bin/netmode /usr/sbin/netpilot-rebuild /usr/sbin/netpilot-firewall /usr/sbin/netpilot-nodes
 chmod 644 /www/netpilot.html /usr/share/netpilot/base.yaml /usr/lib/netpilot/config.sh
 ln -sf netmode /www/cgi-bin/netpilot
 cat > /www/net.html <<'EOF'

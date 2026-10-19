@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+API="${NETPILOT_MIHOMO_API:-http://127.0.0.1:9090}"
+LIB="${NETPILOT_LIB_DIR:-/usr/lib/netpilot}"
+work=$(mktemp -d /tmp/netpilot-nodes.XXXXXX)
+chmod 700 "$work"
+trap 'rm -rf "$work"' EXIT INT TERM
+read_snapshot() {
+    curl -fsS --connect-timeout 2 --max-time 5 "$API/proxies" -o "$work/proxies.json" 2>/dev/null
+}
+read_snapshot || { echo '代理服务暂时不可用' >&2; exit 1; }
+case "${1:-list}" in
+    list)
+        ucode "$LIB/nodes.uc" list "$work/proxies.json"
+        ;;
+    select)
+        cat > "$work/name"
+        ucode "$LIB/nodes.uc" request "$work/proxies.json" "$work/name" > "$work/request.json"
+        curl -fsS --connect-timeout 2 --max-time 5 -X PUT "$API/proxies/PROXY" \
+            -H 'Content-Type: application/json' --data-binary "@$work/request.json" -o /dev/null 2>/dev/null || exit 1
+        read_snapshot || exit 1
+        ucode "$LIB/nodes.uc" verify "$work/proxies.json" "$work/name"
+        ;;
+    check)
+        curl -fsS --connect-timeout 2 --max-time 15 "$API/providers/proxies/airport/healthcheck" -o /dev/null 2>/dev/null || exit 1
+        read_snapshot || exit 1
+        ucode "$LIB/nodes.uc" list "$work/proxies.json"
+        ;;
+    *) echo '未知的节点操作' >&2; exit 1 ;;
+esac

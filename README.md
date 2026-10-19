@@ -4,6 +4,14 @@
 
 本项目基于用户提供的 `luci-app-netmode` 1.0.0 源码修复，界面及安装名称统一为 **NetPilot 网络助手**。为兼容旧设备，保留 `/etc/allinone`、`allinone` 服务及 `netmode` nftables 表的内部名称。
 
+## 控制台
+
+界面采用 iOS 设置列表和底部弹窗，跟随系统切换深浅色。首页显示设备模式、当前节点、订阅和去广告规则；长链接、导入表单和运行细节在需要时展开。
+
+点击“代理 → 节点”，可选择自动选择或订阅中的具体节点，并查看、更新延迟。节点较多时支持搜索。切换通过 Mihomo API 执行并读取结果确认，不重启服务。Mihomo 的 `store-selected` 会保留节点选择。
+
+**所选节点由所有代理设备共用。** 设备模式、规则/全局分流仍分别保存。节点切换用于新连接，已建立的连接可继续使用原节点。
+
 ## 模式
 
 | 设备模式 | DNS | 数据流量 |
@@ -19,12 +27,12 @@
 
 ## 安装
 
-依赖：`mihomo`、`curl`、`nftables`、`ip-full`、`dnsmasq-full`、`jsonfilter`、`ca-bundle`。完整 TPROXY 模式还需要内核启用 `CONFIG_IP_ADVANCED_ROUTER` / `CONFIG_IP_MULTIPLE_TABLES`，并具备 `kmod-nft-tproxy` 及 `kmod-nft-socket`。
+依赖：`mihomo`、`curl`、`nftables`、`ip-full`、`dnsmasq-full`、`jsonfilter`、`ucode`、`ucode-mod-fs`、`ca-bundle`。完整 TPROXY 模式还需要内核启用 `CONFIG_IP_ADVANCED_ROUTER` / `CONFIG_IP_MULTIPLE_TABLES`，并具备 `kmod-nft-tproxy` 及 `kmod-nft-socket`。
 
 先安装 [Mihomo 官方核心](https://github.com/MetaCubeX/mihomo/releases)，放到 `/usr/bin/mihomo` 并赋予执行权限。本项目不将失效镜像或不可执行的下载占位脚本作为核心。
 
 ```sh
-tar -xzf netpilot-router-1.1.0.tar.gz
+tar -xzf netpilot-router-1.2.0.tar.gz
 sh install.sh
 ```
 
@@ -72,9 +80,13 @@ cat /etc/allinone/adblock.count
 
 ```sh
 bash tests/test_domains.sh
+sh tests/test_nodes.sh  # 需要 ucode 和 jsonfilter，也可在路由器上运行
+node tests/ui.mjs      # Linux + Node.js 22+ + Chrome；CHROME_BIN 可指定浏览器路径
 bash build.sh
 ```
 
 `dist/` 生成可在 APK / OPKG 固件上使用的文件安装包和 SHA-256 清单；它不冒充已注册的 APK/IPK。安装器保留既有用户数据，源码仓库不包含私有配置和核心二进制。
 
 实际路由器测试范围与结果见 [VALIDATION.md](VALIDATION.md)。
+
+节点操作依据 [Mihomo API 文档](https://wiki.metacubex.one/api/)，使用固定的 `PROXY` 选择组；接口只返回节点名称、延迟和选择状态，不转发节点凭据。
