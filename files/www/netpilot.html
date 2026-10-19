@@ -92,9 +92,11 @@
     .sheet::backdrop { background:rgba(0,0,0,.38); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); }
     .grabber { width:34px; height:5px; margin:8px auto 0; border-radius:6px; background:var(--tertiary); opacity:.45; flex-shrink:0; }
     .sheet-header { display:grid; grid-template-columns:minmax(60px,1fr) minmax(0,2fr) minmax(60px,1fr); gap:5px; align-items:center; padding:3px 12px 7px; flex-shrink:0; }
-    .sheet-header h2 { margin:0; font-size:17px; font-weight:600; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sheet-header h2 { grid-column:2; grid-row:1; margin:0; font-size:17px; font-weight:600; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .text-button { padding:10px 8px; min-height:44px; color:var(--blue); font-size:16px; }
-    .sheet-left { justify-self:start; } .sheet-right { justify-self:end; font-weight:600; }
+    .sheet-left { grid-column:1; grid-row:1; justify-self:start; } .sheet-right { grid-column:3; grid-row:1; justify-self:end; font-weight:600; }
+    .sheet-header h2:focus { outline:none; }
+    .sheet-header button { border-radius:10px; }
     .sheet-body { padding:0 16px calc(18px + env(safe-area-inset-bottom,0px)); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; min-height:0; }
     .search { display:flex; align-items:center; gap:8px; min-height:44px; padding:9px 12px; background:var(--fill); border-radius:11px; margin-bottom:14px; }
     .search svg { width:18px; height:18px; color:var(--tertiary); }
@@ -246,8 +248,8 @@
     <div class="grabber" aria-hidden="true"></div>
     <header class="sheet-header">
       <button class="text-button sheet-left" id="checkNodes" type="button" data-mutation>测延迟</button>
-      <h2 id="nodeDialogTitle">选择节点</h2>
-      <button class="text-button sheet-right" type="button" data-close="nodeDialog" autofocus>完成</button>
+      <h2 id="nodeDialogTitle" tabindex="-1" autofocus>选择节点</h2>
+      <button class="text-button sheet-right" type="button" data-close="nodeDialog">完成</button>
     </header>
     <div class="sheet-body" id="nodeBody">
       <label class="search" id="nodeSearchWrap" hidden><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="nodeSearch" type="search" placeholder="搜索节点" aria-label="搜索节点" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
@@ -261,8 +263,8 @@
     <div class="grabber" aria-hidden="true"></div>
     <header class="sheet-header">
       <button class="text-button sheet-left" id="sourceBack" type="button" hidden>返回</button>
-      <h2 id="sourceDialogTitle">订阅</h2>
-      <button class="text-button sheet-right" id="sourceDone" type="button" autofocus>完成</button>
+      <h2 id="sourceDialogTitle" tabindex="-1" autofocus>订阅</h2>
+      <button class="text-button sheet-right" id="sourceDone" type="button">完成</button>
     </header>
     <div class="sheet-body" id="sourceBody">
       <div id="sourceOverview">
@@ -418,7 +420,10 @@
       const selectedIndex = profiles.findIndex((item) => item.active);
       $("subscriptionSummary").textContent = selectedIndex < 0 ? "未添加" : friendlyName(profiles[selectedIndex], selectedIndex, "clash");
       const count = filters.filter((item) => item.enabled).length;
-      $("filterSummary").textContent = count + " 个规则源已启用 · " + Number(data.adblock_rules || 0).toLocaleString("zh-CN") + " 条域名";
+      const filtering = data.mode === "adg" || data.mode === "both";
+      $("filterSummary").textContent = filtering
+        ? "此设备已启用 · " + Number(data.adblock_rules || 0).toLocaleString("zh-CN") + " 条域名"
+        : "此设备未启用 · " + count + " 个规则源";
       $("backendNote").hidden = data.backend !== "redirect";
       $("backendValue").textContent = data.backend === "tproxy" ? "TCP / UDP" : (data.backend === "redirect" ? "TCP 兼容模式" : "未知");
       $("firewallValue").textContent = data.firewall_ready ? "已就绪" : "未就绪";
@@ -558,7 +563,10 @@
       $("sourceDone").textContent = "完成";
       $("sourceDone").disabled = false;
       $("addSourceLabel").textContent = kind === "clash" ? "添加订阅" : "添加规则";
-      $("sourceHelp").textContent = kind === "clash" ? "每次使用一个订阅。" : "已启用的规则一起使用。";
+      $("sourceHelp").textContent = kind === "clash" ? "每次使用一个订阅。"
+        : (state && (state.mode === "adg" || state.mode === "both")
+          ? "此设备正在使用已启用的规则。DNS 过滤不隐藏页面广告框。"
+          : "此设备尚未过滤。请在首页选择“仅去广告”或“去广告与代理”。");
       openDialog($("sourceDialog"), trigger);
       renderSources();
     }

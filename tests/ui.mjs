@@ -17,7 +17,7 @@ const errors = [], requests = [];
 let simulateBusy = false;
 const fixture = {
   ok:true, hostname:'iPhone', ip:'192.168.9.200', mac:'02:00:00:00:00:01', mode:'both', routing:'rule',
-  core_running:true, firewall_ready:true, backend:'redirect', adblock_rules:958, memory_mb:'53.9', version:'1.2.0',
+  core_running:true, firewall_ready:true, backend:'redirect', adblock_rules:958, memory_mb:'53.9', version:'1.2.1',
   clash_profiles:[{id:'subscription',name:'机场订阅-1792418607',type:'http',value:'https://example.com/sub?token=fixture',active:true}],
   adg_sources:[{id:'filter',name:'秋风广告规则 AWAvenue',type:'http',format:'yaml',value:'https://example.com/filter.yaml',enabled:true}],
   node_selection:{available:true,selected:'AUTO',current:'VLESS-REALITY',scope:'router',nodes:[
@@ -62,6 +62,11 @@ class CDP {
     const r=await this.evaluate('(()=>{const e=document.querySelector('+JSON.stringify(selector)+'); if(!e) throw Error("Missing control"); e.scrollIntoView({block:"nearest"}); const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()');
     await this.send('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...r});
     await this.send('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...r});
+  }
+  async tap(selector) {
+    const point=await this.evaluate('(()=>{const e=document.querySelector('+JSON.stringify(selector)+');e.scrollIntoView({block:"nearest"});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()');
+    await this.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
+    await this.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   }
   async screenshot(name) {
     await sleep(200);
@@ -140,6 +145,10 @@ try {
     await cdp.evaluate('refresh(false)');
     assert.equal(await cdp.evaluate('document.getElementById("serviceStatus").textContent'),'运行中','A concurrent operation is not a connection failure');
     simulateBusy=false;
+    fixture.mode='direct';await cdp.evaluate('refresh(false)');
+    assert.equal(await cdp.evaluate('document.getElementById("filterSummary").textContent.includes("此设备未启用")'),true,'Saved filters look active in direct mode');
+    fixture.mode='both';await cdp.evaluate('refresh(false)');
+    assert.equal(await cdp.evaluate('document.getElementById("filterSummary").textContent.includes("此设备已启用")'),true);
   }
   await cdp.screenshot('ios-dark.png');
   await cdp.click('#nodeButton');await cdp.wait('document.getElementById("nodeDialog").open');
@@ -151,6 +160,32 @@ try {
   await cdp.click('[data-close="nodeDialog"]');
   await cdp.wait('!document.getElementById("nodeDialog").open');
   assert.equal(await cdp.evaluate('document.activeElement.id'),'nodeButton','Focus restoration');
+
+  // Both source sheets hide their left button. Their title and Done must stay
+  // in the middle/right columns, with no forced focus ring on touch opening.
+  for (const trigger of ['#clashButton','#adgButton']) {
+    await cdp.tap(trigger);
+    await cdp.wait('document.getElementById("sourceDialog").open && document.getElementById("sourceDialog").getBoundingClientRect().bottom<=innerHeight+1');
+    const header=await cdp.evaluate('(()=>{const d=document.getElementById("sourceDialog").getBoundingClientRect(),t=document.getElementById("sourceDialogTitle").getBoundingClientRect(),b=document.getElementById("sourceDone").getBoundingClientRect();return {centerError:Math.abs(t.x+t.width/2-d.x-d.width/2),rightGap:d.right-b.right,buttonWidth:b.width,buttonHeight:b.height,focused:document.activeElement.id,outline:getComputedStyle(document.getElementById("sourceDone")).outlineStyle};})()');
+    assert(header.centerError<2,'Source title is not centered: '+JSON.stringify(header));
+    assert(header.rightGap>=8&&header.rightGap<=20,'Done is not on the right edge');
+    assert(header.buttonWidth>=44&&header.buttonHeight>=44,'Small Done touch target');
+    assert.equal(header.focused,'sourceDialogTitle','Modal initially focuses its title');
+    assert.equal(header.outline,'none','Touch opening gives Done a focus ring');
+    await cdp.screenshot(trigger==='#adgButton'?'ios-filter-sheet.png':'ios-subscription-sheet.png');
+    await cdp.tap('#sourceDone');
+    await cdp.wait('!document.getElementById("sourceDialog").open');
+    assert.equal(await cdp.evaluate('document.body.style.position'),'','Done leaves page locked');
+    assert.equal(await cdp.evaluate('document.activeElement.id'),trigger.slice(1),'Source focus restoration');
+  }
+  await cdp.tap('#clashButton');await cdp.wait('document.getElementById("sourceDialog").open');
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  assert.equal(await cdp.evaluate('document.activeElement.id'),'sourceDone','Keyboard cannot reach Done');
+  assert.equal(await cdp.evaluate('getComputedStyle(document.activeElement).outlineStyle'),'solid','Keyboard focus indicator was removed');
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,nativeVirtualKeyCode:13,text:'\r',unmodifiedText:'\r'});
+  await cdp.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await cdp.wait('!document.getElementById("sourceDialog").open');
 
   if (!process.env.LIVE_URL) {
     await cdp.click('#nodeButton');
@@ -194,12 +229,18 @@ try {
     const fits=await cdp.evaluate('(()=>{let r=document.getElementById("nodeDialog").getBoundingClientRect();return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1;})()');
     assert.equal(fits,true,'Dialog does not fit '+width+'x'+height);
     await cdp.click('[data-close="nodeDialog"]');
+    for (const trigger of ['#clashButton','#adgButton']) {
+      await cdp.tap(trigger);
+      await cdp.wait('document.getElementById("sourceDialog").getBoundingClientRect().bottom<=innerHeight+1');
+      assert.equal(await cdp.evaluate('(()=>{const r=document.getElementById("sourceDialog").getBoundingClientRect(),b=document.getElementById("sourceDone").getBoundingClientRect(),t=document.getElementById("sourceDialogTitle").getBoundingClientRect();return Math.abs(t.x+t.width/2-r.x-r.width/2)<2&&b.right<=r.right&&b.left>t.right;})()'),true,'Source header layout at width '+width);
+      await cdp.tap('#sourceDone');await cdp.wait('!document.getElementById("sourceDialog").open');
+    }
   }
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});
   await cdp.evaluate('window.scrollTo(0,0)');await cdp.screenshot('ios-light.png');
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: phone/desktop layouts, dark/light themes, modal focus and overflow'+(process.env.LIVE_URL?' (live router)':', node selection/search, POST actions and failed-import recovery'));
+  console.log('PASS: phone/desktop layouts, dark/light themes, modal focus, source-sheet header positions and touch Done'+(process.env.LIVE_URL?' (live router)':', node selection/search, POST actions and failed-import recovery'));
   console.log('Screenshots: '+output);
 } finally {
   if (cdp) {try {await cdp.send('Browser.close');} catch {}}

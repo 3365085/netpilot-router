@@ -32,7 +32,7 @@
 先安装 [Mihomo 官方核心](https://github.com/MetaCubeX/mihomo/releases)，放到 `/usr/bin/mihomo` 并赋予执行权限。本项目不将失效镜像或不可执行的下载占位脚本作为核心。
 
 ```sh
-tar -xzf netpilot-router-1.2.0.tar.gz
+tar -xzf netpilot-router-1.2.1.tar.gz
 sh install.sh
 ```
 
@@ -46,7 +46,15 @@ sh install.sh
 
 Clash 订阅直接在路由器与订阅服务之间获取，不经过订阅转换网站。代理自动选择组只包含订阅节点，不把直连放入竞速组。
 
-默认去广告源为 [秋风广告规则 AWAvenue](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) 的 Mihomo domain YAML，安装器默认使用已在目标路由器验证可达的 gcore CDN 线路。原始地址：
+新安装默认叠加两份域名规则：[秋风广告规则 AWAvenue](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) 补充国内广告，[HaGeZi Light](https://github.com/hagezi/dns-blocklists#-multi-light-basic-protection) 扩大常见广告与追踪域名覆盖。Light 比更高档列表保守，刻意保留部分错误上报服务。两份源均已在目标路由器验证可下载、可编译；已有安装升级时保留原规则列表，可在界面手动添加第二份源。
+
+HaGeZi Light 域名文本地址：
+
+```text
+https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/light-onlydomains.txt
+```
+
+AWAvenue 的 Mihomo domain YAML 原始地址：
 
 ```text
 https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.yaml
@@ -61,6 +69,10 @@ https://gcore.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenu
 去广告支持 domain YAML、纯域名、hosts 和无条件的 `||domain^` DNS 规则，统一转换为域名规则并同时用于 DNS 和流量拦截。MRS、浏览器美容规则、路径规则和带条件/例外的复杂 AdBlock 列表不属于此功能的输入格式。广告与正文共用域名、应用内加密 DNS、缓存结果等场景无法保证过滤。
 
 规则默认每天 04:23 更新。下载失败时保留缓存；无可用规则或配置验证失败时返回错误，不报告已成功应用。配置通过 Mihomo 和 dnsmasq 检查后才替换运行文件。
+
+规则源的开关是全路由器共用的；首页模式决定当前设备是否使用它们。界面会分别显示“此设备已启用”和“此设备未启用”。若页面仍有广告，先看当前设备模式，再考虑旧 DNS 缓存、加密 DNS / 本机代理，以及与正文共用域名的广告。
+
+在 `https://adblock.turtlecute.org` 的实际对照结果与方法见 [VALIDATION.md](VALIDATION.md)。DNS 过滤可拦截广告 SDK 使用的独立域名，但不能保证去掉所有开屏、插屏或全屏广告；页面元素隐藏和同域路径过滤需要设备端内容过滤支持。
 
 ## 运维
 

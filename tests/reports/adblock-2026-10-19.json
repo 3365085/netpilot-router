@@ -1,0 +1,5751 @@
+{
+  "tested_at_utc": "2026-10-19T18:04:22+00:00",
+  "version": "1.2.1",
+  "test_site": "https://adblock.turtlecute.org/",
+  "test_site_version": "3.1.3",
+  "browser": "Linux Chrome 151, clean profile without extensions",
+  "path": "Browser -> loopback SSH tunnel -> TCP relay inside router test LAN network namespace -> per-device DNS / forwarding rules. DNS is resolved inside the namespace against the router; no host FlClash exit.",
+  "rules": {
+    "AWAvenue": 958,
+    "HaGeZi Light": 65249,
+    "combined_unique": 65745
+  },
+  "website_results": [
+    {
+      "mode": "direct",
+      "total": 132,
+      "blocked": 31,
+      "not_blocked": 101,
+      "percent": 23.48,
+      "cosmetic": {
+        "static": false,
+        "dynamic": false
+      },
+      "script": {
+        "ads": false,
+        "pagead": false
+      }
+    },
+    {
+      "mode": "adg-awavenue",
+      "total": 132,
+      "blocked": 92,
+      "not_blocked": 40,
+      "percent": 69.7,
+      "cosmetic": {
+        "static": false,
+        "dynamic": false
+      },
+      "script": {
+        "ads": false,
+        "pagead": false
+      }
+    },
+    {
+      "mode": "adg-combined",
+      "total": 132,
+      "blocked": 121,
+      "not_blocked": 11,
+      "percent": 91.67,
+      "cosmetic": {
+        "static": false,
+        "dynamic": false
+      },
+      "script": {
+        "ads": false,
+        "pagead": false
+      }
+    },
+    {
+      "mode": "both-rule",
+      "total": 132,
+      "blocked": 121,
+      "not_blocked": 11,
+      "percent": 91.67,
+      "cosmetic": {
+        "static": false,
+        "dynamic": false
+      },
+      "script": {
+        "ads": false,
+        "pagead": false
+      }
+    },
+    {
+      "mode": "both-global",
+      "total": 132,
+      "blocked": 121,
+      "not_blocked": 11,
+      "percent": 91.67,
+      "cosmetic": {
+        "static": false,
+        "dynamic": false
+      },
+      "script": {
+        "ads": false,
+        "pagead": false
+      }
+    }
+  ],
+  "test_site_dns": [
+    {
+      "host": "adtago.s3.amazonaws.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analyticsengine.s3.amazonaws.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.s3.amazonaws.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 9
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "advice-ads.s3.amazonaws.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "pagead2.googlesyndication.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adservice.google.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "pagead2.googleadservices.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "afs.googlesyndication.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "stats.g.doubleclick.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ad.doubleclick.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "static.doubleclick.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "m.doubleclick.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "mediavisor.doubleclick.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 6
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 6
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads30.adcolony.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adc3-launch.adcolony.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "events3alt.adcolony.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "wd.adcolony.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "static.media.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "media.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adservetx.media.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.google.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "click.googleanalytics.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "google-analytics.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ssl.google-analytics.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adm.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "identify.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "insights.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "script.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "surveys.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "careers.hotjar.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "events.hotjar.io",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "cdn.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "o2.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "gtm.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "api.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "tools.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "cdn-test.mouseflow.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "freshmarketer.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "claritybt.freshmarketer.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "fwtracks.freshmarketer.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "luckyorange.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "api.luckyorange.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "realtime.luckyorange.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "cdn.luckyorange.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "w1.luckyorange.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "upload.luckyorange.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "cs.luckyorange.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "settings.luckyorange.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "stats.wp.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "notify.bugsnag.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "sessions.bugsnag.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "api.bugsnag.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "app.bugsnag.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "browser.sentry-cdn.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "app.getsentry.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      }
+    },
+    {
+      "host": "pixel.facebook.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "an.facebook.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": -1,
+        "answers": 0,
+        "timeout": true
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "static.ads-twitter.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads-api.twitter.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads.linkedin.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.pointdrive.linkedin.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads.pinterest.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "log.pinterest.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "trk.pinterest.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "events.reddit.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "events.redditmedia.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads.youtube.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads-api.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads-sg.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics-sg.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "business-api.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads.tiktok.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "log.byteoversea.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ads.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "geo.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "udcm.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics.query.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "partnerads.ysm.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "log.fc.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "gemini.yahoo.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": -1,
+        "answers": 0,
+        "timeout": true
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adtech.yahooinc.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "extmaps-api.yandex.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "appmetrica.yandex.ru",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "adfstat.yandex.ru",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "metrika.yandex.ru",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "offerwall.yandex.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adfox.yandex.ru",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "auction.unityads.unity3d.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "webview.unityads.unity3d.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 6
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "config.unityads.unity3d.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adserver.unityads.unity3d.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "iot-eu-logser.realme.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "iot-logser.realme.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "bdapi-ads.realmemobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "bdapi-in-ads.realmemobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "api.ad.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "data.mistat.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "data.mistat.india.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "data.mistat.rus.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "sdkconfig.ad.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "sdkconfig.ad.intl.xiaomi.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 21
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "tracking.rus.miui.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adsfs.oppomobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 7
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adx.ads.oppomobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ck.ads.oppomobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "data.ads.oppomobile.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "metrics.data.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "metrics2.data.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "grs.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "logservice.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "logservice1.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "logbak.hicloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "click.oneplus.cn",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "samsungads.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "smetrics.samsung.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "nmetrics.samsung.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "samsung-com.112.2o7.net",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "analytics-api.samsunghealthcn.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "iadsdk.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "metrics.icloud.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "metrics.mzstatic.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "api-adservices.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "books-analytics-events.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "weather-analytics-events.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "notes-analytics-events.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "www.baidu.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      }
+    },
+    {
+      "host": "www.qq.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "www.jd.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "www.bilibili.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      }
+    },
+    {
+      "host": "www.apple.com",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "adblock.turtlecute.org",
+      "transport": "udp",
+      "type": 1,
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      }
+    },
+    {
+      "host": "ad.doubleclick.net",
+      "transport": "tcp",
+      "type": 1,
+      "direct": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-awavenue": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "www.baidu.com",
+      "transport": "tcp",
+      "type": 1,
+      "direct": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-combined": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "both-rule": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "both-global": {
+        "transport": "tcp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      }
+    },
+    {
+      "host": "ad.doubleclick.net",
+      "transport": "udp",
+      "type": 28,
+      "direct": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 0
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 3,
+        "answers": 0
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 3,
+        "answers": 0
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "www.baidu.com",
+      "transport": "udp",
+      "type": 28,
+      "direct": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 3
+      },
+      "adg-awavenue": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 1
+      },
+      "adg-combined": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-rule": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 1
+      },
+      "both-global": {
+        "transport": "udp",
+        "type": 28,
+        "rcode": 0,
+        "answers": 1
+      }
+    }
+  ],
+  "domestic_dns": [
+    {
+      "host": "www.baidu.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      }
+    },
+    {
+      "host": "www.qq.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "www.jd.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      }
+    },
+    {
+      "host": "www.taobao.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      }
+    },
+    {
+      "host": "www.bilibili.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 13
+      }
+    },
+    {
+      "host": "www.zhihu.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      }
+    },
+    {
+      "host": "www.douyin.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 9
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 9
+      }
+    },
+    {
+      "host": "www.xiaohongshu.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      }
+    },
+    {
+      "host": "www.apple.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 10
+      }
+    },
+    {
+      "host": "adblock.turtlecute.org",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 5
+      }
+    },
+    {
+      "host": "github.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      }
+    },
+    {
+      "host": "ads.huawei.com",
+      "role": "normal_control",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      }
+    },
+    {
+      "host": "pangolin.snssdk.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 11
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "pangolin-sdk-toutiao.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 0
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "pangolin-sdk-toutiao-b.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 0
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "mi.gdt.qq.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 1
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "win.gdt.qq.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 6
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "mobads.baidu.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "mobads-logs.baidu.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "cpro.baidu.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "open.e.kuaishou.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "api.e.kuaishou.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "ad.dcloud.net.cn",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 1
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 1
+      }
+    },
+    {
+      "host": "api.ad.xiaomi.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "sdkconfig.ad.xiaomi.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 3
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adsfs.oppomobile.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 7
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adsv2.oppomobile.com",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adlog.vivo.com.cn",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 2
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adreq.vivo.com.cn",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 4
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    },
+    {
+      "host": "adx-drcn.op.dbankcloud.cn",
+      "role": "ad_sdk_sample",
+      "direct": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 0,
+        "answers": 12
+      },
+      "filtered": {
+        "transport": "udp",
+        "type": 1,
+        "rcode": 3,
+        "answers": 0
+      }
+    }
+  ],
+  "https_homepages": {
+    "direct": [
+      {
+        "url": "https://www.baidu.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 227,
+        "seconds": 0.324973,
+        "error": null
+      },
+      {
+        "url": "https://www.qq.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 25775,
+        "seconds": 0.425342,
+        "error": null
+      },
+      {
+        "url": "https://www.jd.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 55584,
+        "seconds": 0.226229,
+        "error": null
+      },
+      {
+        "url": "https://www.taobao.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 22380,
+        "seconds": 0.216027,
+        "error": null
+      },
+      {
+        "url": "https://www.bilibili.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 687,
+        "seconds": 0.265991,
+        "error": null
+      },
+      {
+        "url": "https://www.zhihu.com/",
+        "status": 403,
+        "exit": 0,
+        "bytes": 233,
+        "seconds": 0.261495,
+        "error": null
+      },
+      {
+        "url": "https://www.douyin.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 21049,
+        "seconds": 0.373915,
+        "error": null
+      },
+      {
+        "url": "https://www.xiaohongshu.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 14927,
+        "seconds": 0.532613,
+        "error": null
+      },
+      {
+        "url": "https://www.apple.com/cn/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 38001,
+        "seconds": 0.339283,
+        "error": null
+      }
+    ],
+    "adg": [
+      {
+        "url": "https://www.baidu.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 227,
+        "seconds": 0.382183,
+        "error": null
+      },
+      {
+        "url": "https://www.qq.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 25788,
+        "seconds": 0.455546,
+        "error": null
+      },
+      {
+        "url": "https://www.jd.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 55511,
+        "seconds": 0.210146,
+        "error": null
+      },
+      {
+        "url": "https://www.taobao.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 22312,
+        "seconds": 0.208618,
+        "error": null
+      },
+      {
+        "url": "https://www.bilibili.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 685,
+        "seconds": 0.280083,
+        "error": null
+      },
+      {
+        "url": "https://www.zhihu.com/",
+        "status": 403,
+        "exit": 0,
+        "bytes": 232,
+        "seconds": 0.204628,
+        "error": null
+      },
+      {
+        "url": "https://www.douyin.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 21021,
+        "seconds": 0.242767,
+        "error": null
+      },
+      {
+        "url": "https://www.xiaohongshu.com/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 14931,
+        "seconds": 0.493169,
+        "error": null
+      },
+      {
+        "url": "https://www.apple.com/cn/",
+        "status": 200,
+        "exit": 0,
+        "bytes": 145249,
+        "seconds": 0.378815,
+        "error": null
+      }
+    ]
+  },
+  "browser_homepages": {
+    "direct": [
+      {
+        "request": "https://www.baidu.com/",
+        "final_url": "https://www.baidu.com/",
+        "title": "百度一下，你就知道",
+        "links": 68,
+        "loaded_scripts": 35,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.qq.com/",
+        "final_url": "https://www.qq.com/",
+        "title": "腾讯网",
+        "links": 181,
+        "loaded_scripts": 17,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.jd.com/",
+        "final_url": "https://www.jd.com/",
+        "title": "京东(JD.COM)-正品低价、品质保障、配送及时、轻松购物！",
+        "links": 344,
+        "loaded_scripts": 49,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.taobao.com/",
+        "final_url": "https://www.taobao.com/",
+        "title": "淘宝",
+        "links": 1930,
+        "loaded_scripts": 48,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.bilibili.com/",
+        "final_url": "https://www.bilibili.com/",
+        "title": "哔哩哔哩 (゜-゜)つロ 干杯~-bilibili",
+        "links": 150,
+        "loaded_scripts": 13,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.douyin.com/",
+        "final_url": "https://www.douyin.com/",
+        "title": "验证码中间页",
+        "links": 0,
+        "loaded_scripts": 1,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.xiaohongshu.com/",
+        "final_url": "https://www.xiaohongshu.com/website-login/error",
+        "title": "小红书",
+        "links": 0,
+        "loaded_scripts": 8,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": "300012",
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.apple.com/cn/",
+        "final_url": "https://www.apple.com.cn/",
+        "title": "Apple (中国大陆) - 官方网站",
+        "links": 270,
+        "loaded_scripts": 22,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      }
+    ],
+    "adg": [
+      {
+        "request": "https://www.baidu.com/",
+        "final_url": "https://www.baidu.com/",
+        "title": "百度一下，你就知道",
+        "links": 68,
+        "loaded_scripts": 36,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": [
+          "hectorstatic.baidu.com"
+        ]
+      },
+      {
+        "request": "https://www.qq.com/",
+        "final_url": "https://www.qq.com/",
+        "title": "腾讯网",
+        "links": 181,
+        "loaded_scripts": 19,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": [
+          "beacon.cdn.qq.com"
+        ]
+      },
+      {
+        "request": "https://www.jd.com/",
+        "final_url": "https://www.jd.com/",
+        "title": "京东(JD.COM)-正品低价、品质保障、配送及时、轻松购物！",
+        "links": 279,
+        "loaded_scripts": 46,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.taobao.com/",
+        "final_url": "https://www.taobao.com/",
+        "title": "淘宝",
+        "links": 1925,
+        "loaded_scripts": 51,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.bilibili.com/",
+        "final_url": "https://www.bilibili.com/",
+        "title": "哔哩哔哩 (゜-゜)つロ 干杯~-bilibili",
+        "links": 150,
+        "loaded_scripts": 13,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.douyin.com/",
+        "final_url": "https://www.douyin.com/",
+        "title": "验证码中间页",
+        "links": 0,
+        "loaded_scripts": 2,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.xiaohongshu.com/",
+        "final_url": "https://www.xiaohongshu.com/website-login/error",
+        "title": "安全限制",
+        "links": 0,
+        "loaded_scripts": 11,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": "300012",
+        "failed_script_hosts": []
+      },
+      {
+        "request": "https://www.apple.com/cn/",
+        "final_url": "https://www.apple.com.cn/",
+        "title": "Apple (中国大陆) - 官方网站",
+        "links": 270,
+        "loaded_scripts": 22,
+        "timeout": false,
+        "navigation_error": null,
+        "site_error_code": null,
+        "failed_script_hosts": []
+      }
+    ]
+  },
+  "limits": [
+    "A failed request on the test website is not automatically proof of DNS filtering; direct baseline also failed 31 checks.",
+    "DNS confirms 121 of 128 test hosts return NXDOMAIN under the combined lists.",
+    "Seven host tests and all four cosmetic/script tests remain unblocked; no test-site-only rules were added.",
+    "Normal-site checks cover homepage rendering and transport, not logged-in payments, playback or every app.",
+    "Douyin CAPTCHA, Zhihu 403 and Xiaohongshu risk code 300012 were also present in direct mode.",
+    "Domain filtering does not guarantee removal of same-domain fullscreen ads or blank ad elements.",
+    "UI checks emulate phone sizes in Linux Chrome; no physical iOS Safari claim."
+  ]
+}

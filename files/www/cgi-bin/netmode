@@ -27,6 +27,7 @@ EOF
     if [ ! -f "$ADG_LIST_FILE" ]; then
         cat > "$ADG_LIST_FILE" 2>/dev/null <<'EOF' || true
 adg_awavenue|秋风广告规则 AWAvenue|http|yaml|https://gcore.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.yaml|1
+adg_hagezi_light|HaGeZi Light|http|text|https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/light-onlydomains.txt|1
 EOF
     fi
 fi
@@ -612,7 +613,7 @@ cat <<EOF
   "clash_profiles": ${CLASH_JSON},
   "adg_sources": ${ADG_JSON},
   "node_selection": ${NODES_JSON},
-  "version": "1.2.0",
+  "version": "1.2.1",
   "ipv6_leak_guard": true,
   "sniffer": true,
   "message": "${SAFE_MSG}"

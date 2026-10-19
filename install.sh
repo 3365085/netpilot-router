@@ -33,6 +33,7 @@ touch /etc/allinone/peers.conf /etc/allinone/clash_profiles.conf
 if [ ! -s /etc/allinone/adg_sources.conf ]; then
     cat > /etc/allinone/adg_sources.conf <<'EOF'
 adg_awavenue|秋风广告规则 AWAvenue|http|yaml|https://gcore.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.yaml|1
+adg_hagezi_light|HaGeZi Light|http|text|https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/light-onlydomains.txt|1
 EOF
 fi
 chmod 600 /etc/allinone/*.conf

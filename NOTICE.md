@@ -7,3 +7,4 @@ Mihomo、dnsmasq 及广告列表仍受各自上游许可证约束。发布包不
 - Mihomo：https://github.com/MetaCubeX/mihomo
 - dnsmasq：https://thekelleys.org.uk/dnsmasq/doc.html
 - AWAvenue：https://github.com/TG-Twilight/AWAvenue-Ads-Rule
+- HaGeZi DNS Blocklists：https://github.com/hagezi/dns-blocklists
